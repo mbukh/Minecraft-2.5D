@@ -3,7 +3,7 @@
 // Robert Friedl https://github.com/rdfriedl
 // refactored for vanilla js by MBUKH.DEV
 
-const gridLayer = document.querySelector(".gridLayer");
+const mapsContainer = document.querySelector("#mapsContainer");
 const h1 = document.querySelector("h1");
 const mapPosition = {};
 const tileTemplate = document.querySelector("body>.tile").cloneNode(true);
@@ -12,37 +12,57 @@ const MAX_ZOOM = 4;
 const MIN_ZOOM = 0.3;
 const GAP_X = 3.5;
 const GAP_Y = 3.5;
-
+const LAYERS_GAP = 2.7;
 let screenReadyToDrag = false;
 let screenDragging = false;
 
 const mapData = [
-    [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1],
-    [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1],
-    [1, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1],
-    [2, 2, 3, 3, 4, 4, 3, 4, 3, 3, 2, 2, 2, 2, 1, 1],
-    [2, 2, 3, 4, 8, 8, 4, 4, 3, 4, 4, 3, 2, 2, 1, 1],
-    [2, 3, 3, 4, 16, 16, 16, 16, 4, 16, 5, 4, 3, 2, 2, 1],
-    [2, 3, 4, 5, 16, 9, 9, 8, 4, 16, 8, 5, 4, 3, 2, 1],
-    [2, 3, 4, 5, 5, 8, 8, 16, 9, 8, 8, 5, 4, 3, 2, 1],
-    [2, 3, 3, 4, 5, 5, 8, 8, 8, 8, 5, 4, 3, 2, 2, 2],
-    [2, 2, 3, 3, 4, 5, 8, 5, 5, 5, 4, 4, 3, 2, 2, 2],
-    [1, 2, 2, 3, 3, 4, 5, 5, 5, 5, 4, 3, 2, 2, 2, 2],
-    [1, 1, 2, 2, 3, 4, 4, 5, 5, 4, 4, 3, 2, 2, 2, 2],
-    [1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 3, 3, 2, 2, 2, 2],
-    [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 1],
-    [1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1],
-    [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1],
+    [
+        [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1],
+        [1, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1],
+        [2, 2, 3, 3, 4, 4, 3, 4, 3, 3, 2, 2, 2, 2, 1, 1],
+        [2, 2, 3, 4, 8, 8, 4, 4, 3, 4, 4, 3, 2, 2, 1, 1],
+        [2, 3, 3, 4, 16, 16, 16, 16, 4, 16, 5, 4, 3, 2, 2, 1],
+        [2, 3, 4, 5, 16, 9, 9, 8, 4, 16, 8, 5, 4, 3, 2, 1],
+        [2, 3, 4, 5, 5, 8, 8, 16, 9, 8, 8, 5, 4, 3, 2, 1],
+        [2, 3, 3, 4, 5, 5, 8, 8, 8, 8, 5, 4, 3, 2, 2, 2],
+        [2, 2, 3, 3, 4, 5, 8, 5, 5, 5, 4, 4, 3, 2, 2, 2],
+        [1, 2, 2, 3, 3, 4, 5, 5, 5, 5, 4, 3, 2, 2, 2, 2],
+        [1, 1, 2, 2, 3, 4, 4, 5, 5, 4, 4, 3, 2, 2, 2, 2],
+        [1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 3, 3, 2, 2, 2, 2],
+        [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 1],
+        [1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1],
+        [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1],
+    ],
+    [
+        [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1],
+        [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 1],
+        [1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 3, 3, 2, 2, 2, 2],
+        [1, 1, 2, 2, 3, 4, 4, 5, 5, 4, 4, 3, 2, 2, 2, 2],
+        [1, 2, 2, 3, 3, 4, 5, 5, 5, 5, 4, 3, 2, 2, 2, 2],
+        [2, 2, 3, 3, 4, 5, 8, 5, 5, 5, 4, 4, 3, 2, 2, 2],
+        [2, 3, 3, 4, 5, 5, 8, 8, 8, 8, 5, 4, 3, 2, 2, 2],
+        [2, 3, 4, 5, 5, 8, 8, 16, 9, 8, 8, 5, 4, 3, 2, 1],
+        [2, 3, 4, 5, 16, 9, 9, 8, 4, 16, 8, 5, 4, 3, 2, 1],
+        [2, 3, 3, 4, 16, 16, 16, 16, 4, 16, 5, 4, 3, 2, 2, 1],
+        [2, 2, 3, 4, 8, 8, 4, 4, 3, 4, 4, 3, 2, 2, 1, 1],
+        [2, 2, 3, 3, 4, 4, 3, 4, 3, 3, 2, 2, 2, 2, 1, 1],
+        [1, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1],
+    ],
 ];
 const [mapSizeH, mapSizeW] = [mapData.length, mapData[0].length];
 
 const createTile = (x, y, layer, tileId) => {
-    let div = getCell(y, x, layer);
-    let tile = div.querySelector(".tile");
+    const cell = getCell(y, x, layer);
+    let tile = cell.querySelector(".tile");
     if (!tile) {
         tile = tileTemplate.cloneNode(true);
         tile.style.setProperty("z-index", (layer + 1) * 1000 + x + y);
-        div.appendChild(tile);
+        cell.appendChild(tile);
     }
     const innerDiv = tile.querySelector("div");
     innerDiv.className = `tile-${tileId}`;
@@ -50,24 +70,37 @@ const createTile = (x, y, layer, tileId) => {
 };
 
 const getCell = (y, x, layer) => {
-    let cell = gridLayer.querySelector(`.y-${y}.x-${x}.layer-${layer}`);
+    const layerDiv = getLayer(layer);
+    let cell = mapsContainer.querySelector(`.y-${y}.x-${x}.layer-${layer}`);
     if (!cell) {
         let transformX, transformY;
         cell = document.createElement("div");
-        cell.classList.add("y-" + y);
-        cell.classList.add("x-" + x);
-        cell.classList.add("layer-" + layer);
+        cell.classList.add(`y-${y}`);
+        cell.classList.add(`x-${x}`);
+        cell.classList.add(`layer-${layer}`);
         transformX = `translateX(${x * GAP_X}em)`;
         transformY = `translateY(${y * GAP_Y}em)`;
-        cell.style.transform = `${transformX} ${transformY}`;
-        gridLayer.appendChild(cell);
+        cell.style.setProperty("transform", `${transformX} ${transformY}`);
+        layerDiv.appendChild(cell);
     }
     return cell;
 };
 
+const getLayer = (layer) => {
+    let layerDiv = mapsContainer.querySelector(`.layerId-${layer}`);
+    if (!layerDiv) {
+        layerDiv = document.createElement("div");
+        layerDiv.classList.add("mapLayer");
+        layerDiv.classList.add(`layerId-${layer}`);
+        layerDiv.style.setProperty("top", `-${layer * LAYERS_GAP}em`);
+        mapsContainer.appendChild(layerDiv);
+    }
+    return layerDiv;
+};
+
 const getTile = (x, y, layer) => {
-    const div = getCell(y, x, layer);
-    const tile = div.querySelector(".tile");
+    const cell = getCell(y, x, layer);
+    const tile = cell.querySelector(".tile");
     if (tile) {
         return tile;
     } else {
@@ -112,15 +145,20 @@ const setMapPosition = (x, y) => {
     mapPosition.x = x;
     mapPosition.y = y;
 
-    const tile = document.querySelector(".tile");
-    const tableW = 0;
-    const tableH = -(tile.offsetHeight * mapSizeH) / 3;
+    // const maxTilesWidth = Math.max(
+    //     ...mapData.map((layer) => Math.max(...layer.map((row) => row.lengths)))
+    // );
+    const maxTilesHeight = Math.max(...mapData.map((layer) => layer.length));
 
-    gridLayer.style.setProperty(
+    const tile = document.querySelector(".tile");
+    const tableW = 0; //-(tile.offsetWidth * maxTilesWidth) / 3;
+    const tableH = -(tile.offsetHeight * maxTilesHeight) / 3;
+
+    mapsContainer.style.setProperty(
         "top",
         `${window.innerHeight / 2 + tableH + y}px`
     );
-    gridLayer.style.setProperty(
+    mapsContainer.style.setProperty(
         "left",
         `${window.innerWidth / 2 + tableW + x}px`
     );
@@ -128,10 +166,10 @@ const setMapPosition = (x, y) => {
 
 function init() {
     // create map
-    for (let layer = 0; layer < 1; layer++) {
-        for (let y = 0; y < mapData.length; y++) {
-            for (let x = 0; x < mapData[y].length; x++) {
-                setTile(x, y, layer, mapData[y][x] - 1);
+    for (let layer = 0; layer < mapData.length; layer++) {
+        for (let y = 0; y < mapData[layer].length; y++) {
+            for (let x = 0; x < mapData[layer][y].length; x++) {
+                setTile(x, y, layer, mapData[layer][y][x] - 1);
             }
         }
     }
@@ -179,7 +217,7 @@ function init() {
             zoom = Math.min(Math.max(MIN_ZOOM, zoom), MAX_ZOOM); // Limit scale
             h1.textContent = "Zoom: " + Math.round(zoom * 100) + "%";
             scaleTimeOut = setTimeout(() => {
-                gridLayer.style.setProperty("scale", zoom);
+                mapsContainer.style.setProperty("scale", zoom);
                 deltaY = 0;
             }, 100);
         },
@@ -222,12 +260,16 @@ document.querySelectorAll(".tile").forEach((el) =>
     })
 );
 
-function createArray(num, dimensions) {
+// MAP GENERATOR
+
+function createArray({ layers, cols, rows }) {
     var array = [];
-    for (var i = 0; i < dimensions; i++) {
-        array.push([]);
-        for (var j = 0; j < dimensions; j++) {
-            array[i].push(num);
+    for (let layers = 0; layers < layers; layers++) {
+        for (var i = 0; i < cols; i++) {
+            array.push([]);
+            for (var j = 0; j < dimensions; j++) {
+                array[i].push(num);
+            }
         }
     }
     return array;

@@ -9,21 +9,23 @@ body {
     /* overflow: hidden; */
     display: flex;
 }
-
-.gridLayer {
+#mapsContainer {
     --tile-scale: 13;
     --tile-offset: 0px * var(--tile-scale); /* default 0.4px */
     --tile-size: 162px;
-    display: block;
-    position: relative;
-    transform: rotateX(60deg) rotateZ(45deg);
     position: absolute;
     left: 50%;
     top: 25%;
-    scale: 2;
+    scale: 1;
     transition: scale 0.3s ease-in-out;
 }
-.gridLayer > div {
+
+.mapLayer {
+    display: block;
+    position: absolute;
+    transform: rotateX(60deg) rotateZ(45deg);
+}
+.mapLayer > div {
     position: absolute;
     top: 0;
     left: 0;
@@ -58,7 +60,7 @@ body {
     background-size: calc(100% * var(--tile-scale)) 100%;
     /* default sprite */
     /* http://img14.deviantart.net/f99b/i/2011/354/d/5/isometric_new_tiles_by_spasquini-d4jnp2i.png */
-    background-image: url(./tiles.png);
+    background-image: url(./tiles-solid.png);
     background-position: -6px 0px;
     background-repeat: no-repeat;
     image-rendering: pixelated;
@@ -70,30 +72,6 @@ body {
     height: 0;
     transition-delay: 1s;
 }
-@keyframes showTile {
-    from {
-        transform: translate3d(12em, 12em, 0em);
-        opacity: 0;
-    }
-
-    to {
-        transform: translate3d(0em, 0em, 0em);
-        opacity: 1;
-    }
-}
-
-@keyframes hideTile {
-    from {
-        transform: translate3d(0em, 0em, 0em);
-        opacity: 1;
-    }
-
-    to {
-        transform: translate3d(12em, 12em, 0em);
-        opacity: 0;
-    }
-}
-
 .tile > div.tile-0 {
     background-position: calc(var(--tile-offset) - (var(--tile-size) * 0)) 0px;
 }
@@ -156,4 +134,30 @@ body {
 
 .tile > div.tile-15 {
     background-position: calc(var(--tile-offset) - (var(--tile-size) * 15)) 0px;
+}
+
+/* Animations */
+
+@keyframes showTile {
+    from {
+        transform: translate3d(12em, 12em, 0em);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate3d(0em, 0em, 0em);
+        opacity: 1;
+    }
+}
+
+@keyframes hideTile {
+    from {
+        transform: translate3d(0em, 0em, 0em);
+        opacity: 1;
+    }
+
+    to {
+        transform: translate3d(12em, 12em, 0em);
+        opacity: 0;
+    }
 }
