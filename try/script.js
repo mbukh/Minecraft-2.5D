@@ -47,8 +47,8 @@ const getCell = (y, x) => {
         cell = document.createElement("div");
         cell.classList.add("row-" + y);
         cell.classList.add("col-" + x);
-        transformY = "translateY(" + y * 4 + "em)";
-        transformX = "translateX(" + x * 4 + "em)";
+        transformY = "translateY(" + y * 5 + "em)";
+        transformX = "translateX(" + x * 5 + "em)";
         cell.style.transform = `${transformX} ${transformY}`;
         mapGrid.appendChild(cell);
     }
@@ -121,8 +121,8 @@ function init() {
     for (let y = 0; y < mapSize; y++) {
         for (let x = 0; x < mapSize; x++) {
             setTile(
-                x - mapSize / 2,
-                y - mapSize / 2,
+                x, // - mapSize / 2,
+                y, // - mapSize / 2,
                 mapData[y * mapSize + x] - 1
             );
         }
@@ -176,20 +176,21 @@ function init() {
         { passive: false }
     );
 
-    var x = -(mapSize / 2);
-    var y = -(mapSize / 2);
-    var func = () => {
-        for (var i = 0; i < 20; i++) {
-            var x = Math.floor(Math.random() * mapSize) - mapSize / 2;
-            var y = Math.floor(Math.random() * mapSize) - mapSize / 2;
-            var tile = getTile(x, y);
+    let x = -1 * (mapSize / 2);
+    let y = -1 * (mapSize / 2);
+
+    const func = () => {
+        for (let i = 0; i < 30; i++) {
+            x = Math.floor(Math.random() * mapSize); // - mapSize / 2;
+            y = Math.floor(Math.random() * mapSize); // - mapSize / 2;
+            const tile = getTile(x, y);
 
             if (tile.classList.contains("hide")) {
                 showTile(x, y);
             }
         }
     };
-    setInterval(func, 200);
+    setInterval(func, 300);
 }
 
 //start
