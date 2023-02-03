@@ -1,16 +1,16 @@
+"use strict";
 // based on a JQuery version https://codepen.io/rdfriedl/pen/bdvrjM
 // refactored for vanilla js by MBUKH.DEV
 
-var grid = document.querySelector("#mapGrid");
-var gridBody = document.querySelector("#mapGrid tbody");
-var mapPosition = {};
-var tileTemplate = document.querySelector("body>.tile").cloneNode(true);
+const mapGrid = document.querySelector("#mapGrid");
+const mapPosition = {};
+const tileTemplate = document.querySelector("body>.tile").cloneNode(true);
+document.querySelector("body>.tile").remove(); // remove template
 
-var screenReadyToDrag = false;
-var screenDragging = false;
+let screenReadyToDrag = false;
+let screenDragging = false;
 
-document.querySelector("body>.tile").remove();
-var mapData = [
+const mapData = [
     1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2,
     2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1, 2, 2,
     3, 3, 4, 4, 3, 4, 3, 3, 2, 2, 2, 2, 1, 1, 2, 2, 3, 4, 8, 8, 4, 4, 3, 4, 4,
@@ -23,45 +23,41 @@ var mapData = [
     1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2,
     2, 2, 1, 1, 1, 1, 1, 1,
 ];
-var mapSize = Math.floor(Math.sqrt(mapData.length));
 
-const getRow = (y) => {
-    if (gridBody.querySelector(".row-" + y)) {
-        return gridBody.querySelector(".row-" + y);
-    } else {
-        return createRow(y);
+const mapSize = Math.floor(Math.sqrt(mapData.length));
+
+const createTile = (x, y, tileId) => {
+    let div = getCell(y, x);
+    let tile = div.querySelector(".tile");
+    if (!tile) {
+        tile = tileTemplate.cloneNode(true);
+        tile.style.setProperty("z-index", (1000 + x + y) * 2);
+        div.appendChild(tile);
     }
+    const innerDiv = tile.querySelector("div");
+    innerDiv.className = `tile-${tileId}`;
+    return tile;
 };
 
-const createRow = (y) => {
-    const newEl = document.createElement("tr");
-    newEl.classList.add("row-" + y);
-    newEl.style.transform = "translateY(" + y * 4 + "em)";
-    gridBody.appendChild(newEl);
-    return newEl;
-};
-
-const getCol = (y, x) => {
-    const row = getRow(y);
-    if (row.querySelector(".col-" + x)) {
-        return row.querySelector(".col-" + x);
-    } else {
-        return createCol(y, x);
+const getCell = (y, x) => {
+    let cell = mapGrid.querySelector(`.row-${y}.col-${x}`);
+    if (!cell) {
+        console.log(cell);
+        let transformX, transformY;
+        cell = document.createElement("div");
+        cell.classList.add("row-" + y);
+        cell.classList.add("col-" + x);
+        transformY = "translateY(" + y * 4 + "em)";
+        transformX = "translateX(" + x * 4 + "em)";
+        cell.style.transform = `${transformX} ${transformY}`;
+        mapGrid.appendChild(cell);
     }
-};
-
-const createCol = (y, x) => {
-    const row = getRow(y);
-    const newEl = document.createElement("td");
-    newEl.classList.add("col-" + x);
-    newEl.style.transform = "translateX(" + x * 4 + "em)";
-    row.appendChild(newEl);
-    return newEl;
+    return cell;
 };
 
 const getTile = (x, y) => {
-    const col = getCol(y, x);
-    const tile = col.querySelector(".tile");
+    const div = getCell(y, x);
+    const tile = div.querySelector(".tile");
     if (tile) {
         return tile;
     } else {
@@ -69,53 +65,38 @@ const getTile = (x, y) => {
     }
 };
 
-const createTile = (x, y, tile) => {
-    const col = getCol(y, x);
-    let $tile = col.querySelector(".tile");
-    if (!$tile) {
-        $tile = tileTemplate.cloneNode(true);
-        $tile.style.setProperty("z-index", (1000 + x + y) * 2);
-        col.appendChild($tile);
-    }
-    const div = $tile.querySelector("div");
-    div.className = "";
-    div.classList.add("tile-" + tile);
-    return $tile;
+const setTile = (x, y, tileId) => {
+    const tile = getTile(x, y);
+    const div = tile.querySelector("div");
+    div.className = `tile-${tileId}`;
 };
 
-const setTile = (x, y, tile) => {
-    const $tile = getTile(x, y);
-    const div = $tile.querySelector("div");
-    div.className = "";
-    div.classList.add("tile-" + tile);
-};
+// const setTileHeight = (x, y, height) => {
+//     const $tile = getTile(x, y);
+//     $tile.style.cssText = `
+//         transform: translate3d(${height}em, ${height}em, 0)",
+//     `;
+// };
 
-const setTileHeight = (x, y, height) => {
-    const $tile = getTile(x, y);
-    $tile.style.cssText = `
-        transform: translate3d(${height}em, ${height}em, 0)",
-    `;
-};
-
-const hideTile = (x, y) => {
-    getTile(x, y).classList.add("hide");
-};
+// const hideTile = (x, y) => {
+//     getTile(x, y).classList.add("hide");
+// };
 
 const showTile = (x, y) => {
     getTile(x, y).classList.remove("hide");
 };
 
-const toggleTile = (x, y) => {
-    getTile(x, y).classList.toggle("hide");
-};
+// const toggleTile = (x, y) => {
+//     getTile(x, y).classList.toggle("hide");
+// };
 
-const setSize = (w, h, tile) => {
-    for (var y = -h / 2; y < h / 2; y++) {
-        for (var x = -w / 2; x < w / 2; x++) {
-            createTile(x, y, tile);
-        }
-    }
-};
+// const setSize = (w, h, tile) => {
+//     for (var y = -h / 2; y < h / 2; y++) {
+//         for (var x = -w / 2; x < w / 2; x++) {
+//             createTile(x, y, tile);
+//         }
+//     }
+// };
 
 const setMapPosition = (x, y) => {
     mapPosition.x = x;
@@ -125,15 +106,20 @@ const setMapPosition = (x, y) => {
     const tableW = 0;
     const tableH = (tile.offsetHeight * mapSize) / 10;
 
-    $el = document.querySelector("table");
-    $el.style.setProperty("top", `${window.innerHeight / 2 + tableH + y}px`);
-    $el.style.setProperty("left", `${window.innerWidth / 2 + tableW + x}px`);
+    mapGrid.style.setProperty(
+        "top",
+        `${window.innerHeight / 2 + tableH + y}px`
+    );
+    mapGrid.style.setProperty(
+        "left",
+        `${window.innerWidth / 2 + tableW + x}px`
+    );
 };
 
 function init() {
-    //create map
-    for (var y = 0; y < mapSize; y++) {
-        for (var x = 0; x < mapSize; x++) {
+    // create map
+    for (let y = 0; y < mapSize; y++) {
+        for (let x = 0; x < mapSize; x++) {
             setTile(
                 x - mapSize / 2,
                 y - mapSize / 2,
@@ -183,7 +169,7 @@ function init() {
                 deltaY = deltaY * Math.sign(e.deltaY); // Normalize scroll wheel
                 scale -= deltaY / 300;
                 scale = Math.min(Math.max(0.4, scale), 2.2); // Limit scale
-                grid.style.scale = scale;
+                mapGrid.style.scale = scale;
                 deltaY = 0;
             }, 20);
         },
@@ -210,7 +196,7 @@ function init() {
 init();
 setTimeout(() => setMapPosition(0, 0), 1000);
 
-window.addEventListener("resize", (e) => setMapPosition(0, 0));
+// window.addEventListener("resize", (e) => setMapPosition(0, 0));
 
 document.querySelectorAll(".tile").forEach((el) =>
     el.addEventListener("click", (e) => {
