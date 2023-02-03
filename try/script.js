@@ -3,15 +3,15 @@
 // Robert Friedl https://github.com/rdfriedl
 // refactored for vanilla js by MBUKH.DEV
 
-const mapGrid = document.querySelector("#mapGrid");
+const gridLayer = document.querySelector(".gridLayer");
 const h1 = document.querySelector("h1");
 const mapPosition = {};
 const tileTemplate = document.querySelector("body>.tile").cloneNode(true);
 document.querySelector("body>.tile").remove(); // remove template
 const MAX_ZOOM = 4;
 const MIN_ZOOM = 0.3;
-const GAP_X = 4;
-const GAP_Y = 5;
+const GAP_X = 3.5;
+const GAP_Y = 3.5;
 
 let screenReadyToDrag = false;
 let screenDragging = false;
@@ -36,12 +36,12 @@ const mapData = [
 ];
 const [mapSizeH, mapSizeW] = [mapData.length, mapData[0].length];
 
-const createTile = (x, y, tileId) => {
-    let div = getCell(y, x);
+const createTile = (x, y, layer, tileId) => {
+    let div = getCell(y, x, layer);
     let tile = div.querySelector(".tile");
     if (!tile) {
         tile = tileTemplate.cloneNode(true);
-        tile.style.setProperty("z-index", (1000 + x + y) * 2);
+        tile.style.setProperty("z-index", (layer + 1) * 1000 + x + y);
         div.appendChild(tile);
     }
     const innerDiv = tile.querySelector("div");
@@ -49,34 +49,34 @@ const createTile = (x, y, tileId) => {
     return tile;
 };
 
-const getCell = (y, x) => {
-    let cell = mapGrid.querySelector(`.row-${y}.col-${x}`);
+const getCell = (y, x, layer) => {
+    let cell = gridLayer.querySelector(`.y-${y}.x-${x}.layer-${layer}`);
     if (!cell) {
-        console.log(cell);
         let transformX, transformY;
         cell = document.createElement("div");
-        cell.classList.add("row-" + y);
-        cell.classList.add("col-" + x);
-        transformY = "translateY(" + y * GAP_Y + "em)";
-        transformX = "translateX(" + x * GAP_X + "em)";
+        cell.classList.add("y-" + y);
+        cell.classList.add("x-" + x);
+        cell.classList.add("layer-" + layer);
+        transformX = `translateX(${x * GAP_X}em)`;
+        transformY = `translateY(${y * GAP_Y}em)`;
         cell.style.transform = `${transformX} ${transformY}`;
-        mapGrid.appendChild(cell);
+        gridLayer.appendChild(cell);
     }
     return cell;
 };
 
-const getTile = (x, y) => {
-    const div = getCell(y, x);
+const getTile = (x, y, layer) => {
+    const div = getCell(y, x, layer);
     const tile = div.querySelector(".tile");
     if (tile) {
         return tile;
     } else {
-        return createTile(x, y, 0);
+        return createTile(x, y, layer, 0);
     }
 };
 
-const setTile = (x, y, tileId) => {
-    const tile = getTile(x, y);
+const setTile = (x, y, layer, tileId) => {
+    const tile = getTile(x, y, layer);
     const div = tile.querySelector("div");
     div.className = `tile-${tileId}`;
 };
@@ -92,8 +92,8 @@ const setTile = (x, y, tileId) => {
 //     getTile(x, y).classList.add("hide");
 // };
 
-const showTile = (x, y) => {
-    getTile(x, y).classList.remove("hide");
+const showTile = (x, y, layer) => {
+    getTile(x, y, layer).classList.remove("hide");
 };
 
 // const toggleTile = (x, y) => {
@@ -116,11 +116,11 @@ const setMapPosition = (x, y) => {
     const tableW = 0;
     const tableH = -(tile.offsetHeight * mapSizeH) / 3;
 
-    mapGrid.style.setProperty(
+    gridLayer.style.setProperty(
         "top",
         `${window.innerHeight / 2 + tableH + y}px`
     );
-    mapGrid.style.setProperty(
+    gridLayer.style.setProperty(
         "left",
         `${window.innerWidth / 2 + tableW + x}px`
     );
@@ -128,9 +128,11 @@ const setMapPosition = (x, y) => {
 
 function init() {
     // create map
-    for (let y = 0; y < mapData.length; y++) {
-        for (let x = 0; x < mapData[y].length; x++) {
-            setTile(x, y, mapData[y][x] - 1);
+    for (let layer = 0; layer < 1; layer++) {
+        for (let y = 0; y < mapData.length; y++) {
+            for (let x = 0; x < mapData[y].length; x++) {
+                setTile(x, y, layer, mapData[y][x] - 1);
+            }
         }
     }
 
@@ -177,7 +179,7 @@ function init() {
             zoom = Math.min(Math.max(MIN_ZOOM, zoom), MAX_ZOOM); // Limit scale
             h1.textContent = "Zoom: " + Math.round(zoom * 100) + "%";
             scaleTimeOut = setTimeout(() => {
-                mapGrid.style.setProperty("scale", zoom);
+                gridLayer.style.setProperty("scale", zoom);
                 deltaY = 0;
             }, 100);
         },
@@ -187,14 +189,17 @@ function init() {
     let x = -1 * (mapSizeW / 2);
     let y = -1 * (mapSizeH / 2);
 
+    // Auto tiles-resetter
     const func = () => {
-        for (let i = 0; i < 30; i++) {
-            x = Math.floor(Math.random() * mapSizeW);
-            y = Math.floor(Math.random() * mapSizeH);
-            const tile = getTile(x, y);
+        for (let layer = 0; layer < 1; layer++) {
+            for (let i = 0; i < 30; i++) {
+                x = Math.floor(Math.random() * mapSizeW);
+                y = Math.floor(Math.random() * mapSizeH);
+                const tile = getTile(x, y, layer);
 
-            if (tile.classList.contains("hide")) {
-                showTile(x, y);
+                if (tile.classList.contains("hide")) {
+                    showTile(x, y, layer);
+                }
             }
         }
     };
@@ -210,28 +215,10 @@ window.addEventListener("resize", (e) => setMapPosition(0, 0));
 document.querySelectorAll(".tile").forEach((el) =>
     el.addEventListener("click", (e) => {
         if (screenDragging) return;
+        console.log("clicked");
         /* Act on the event */
         e.currentTarget.classList.add("hide");
         e.currentTarget.style.opacity = "";
-    })
-);
-
-document.querySelectorAll(".tile").forEach((el) =>
-    el.addEventListener("mouseenter", (e) => {
-        /* Act on the event */
-        // e.currentTarget.classList.add("hide");
-        if (!e.currentTarget.classList.contains("hide")) {
-            e.currentTarget.style.opacity = "0.5";
-        }
-    })
-);
-document.querySelectorAll(".tile").forEach((el) =>
-    el.addEventListener("mouseout", (e) => {
-        /* Act on the event */
-        // e.currentTarget.classList.add("hide");
-        if (!e.currentTarget.classList.contains("hide")) {
-            e.currentTarget.style.opacity = "1";
-        }
     })
 );
 
@@ -244,4 +231,8 @@ function createArray(num, dimensions) {
         }
     }
     return array;
+}
+
+function generateMap() {
+    let map = createArray(0, 10);
 }

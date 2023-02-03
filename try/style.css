@@ -10,7 +10,7 @@ body {
     display: flex;
 }
 
-#mapGrid {
+.gridLayer {
     --tile-scale: 13;
     --tile-offset: 0px * var(--tile-scale); /* default 0.4px */
     --tile-size: 162px;
@@ -20,10 +20,10 @@ body {
     position: absolute;
     left: 50%;
     top: 25%;
-    scale: 1;
+    scale: 2;
     transition: scale 0.3s ease-in-out;
 }
-#mapGrid > div {
+.gridLayer > div {
     position: absolute;
     top: 0;
     left: 0;
@@ -32,36 +32,44 @@ body {
 }
 
 .tile {
+    /* border: 1px solid red;
+    background-color: #f775; */
     /* mouse fix x:y 0px-32px */
     --offset-cursor: 0 0;
     transform: translate3d(0em, 0em, 0em);
-    width: 4em;
-    height: 4em;
+    width: 3.5em;
+    height: 3.5em;
     transition: all 1s cubic-bezier(0.22, 0.6, 0.39, 1.42);
-    cursor: url("./axe-cursor.png") var(--offset-cursor), pointer;
 }
-.tile:active {
+.tile:hover {
+    opacity: 0.5;
 }
 .tile.hide {
-    transform: translate3d(12em, 12em, 0em) !important;
+    transform: translate3d(20em, 20em, 0em);
     opacity: 0;
     transition: all 1s cubic-bezier(0.7, -0.4, 0.88, 0.51);
 }
 
 .tile > div {
-    /* border: 1px solid red; */
-    transform: rotateZ(-45deg) rotateY(-60deg) translate3d(-1.1em, -4.8em, 0em);
+    transform: rotateZ(-45deg) rotateY(-60deg)
+        translate3d(-4.1em, -3.3em, -3.1em);
     width: 10em;
     height: 12em;
     background-size: calc(100% * var(--tile-scale)) 100%;
     /* default sprite */
     /* http://img14.deviantart.net/f99b/i/2011/354/d/5/isometric_new_tiles_by_spasquini-d4jnp2i.png */
-    background-image: url(./tiles-solid.png);
+    background-image: url(./tiles.png);
     background-position: -6px 0px;
     background-repeat: no-repeat;
     image-rendering: pixelated;
+    cursor: url("./axe-cursor.png") var(--offset-cursor), pointer;
+    transition: height;
+    transition-delay: 0;
 }
-
+.tile.hide > div {
+    height: 0;
+    transition-delay: 1s;
+}
 @keyframes showTile {
     from {
         transform: translate3d(12em, 12em, 0em);
