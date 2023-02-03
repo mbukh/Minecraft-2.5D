@@ -1,30 +1,40 @@
 "use strict";
 // based on a JQuery version https://codepen.io/rdfriedl/pen/bdvrjM
+// Robert Friedl https://github.com/rdfriedl
 // refactored for vanilla js by MBUKH.DEV
 
 const mapGrid = document.querySelector("#mapGrid");
+const h1 = document.querySelector("h1");
 const mapPosition = {};
 const tileTemplate = document.querySelector("body>.tile").cloneNode(true);
 document.querySelector("body>.tile").remove(); // remove template
+const MAX_ZOOM = 4;
+const MIN_ZOOM = 0.3;
+const GAP_X = 4;
+const GAP_Y = 5;
 
 let screenReadyToDrag = false;
 let screenDragging = false;
 
 const mapData = [
-    1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2,
-    2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1, 2, 2,
-    3, 3, 4, 4, 3, 4, 3, 3, 2, 2, 2, 2, 1, 1, 2, 2, 3, 4, 8, 8, 4, 4, 3, 4, 4,
-    3, 2, 2, 1, 1, 2, 3, 3, 4, 16, 16, 16, 16, 4, 16, 5, 4, 3, 2, 2, 1, 2, 3, 4,
-    5, 16, 9, 9, 8, 4, 16, 8, 5, 4, 3, 2, 1, 2, 3, 4, 5, 5, 8, 8, 16, 9, 8, 8,
-    5, 4, 3, 2, 1, 2, 3, 3, 4, 5, 5, 8, 8, 8, 8, 5, 4, 3, 2, 2, 2, 2, 2, 3, 3,
-    4, 5, 8, 5, 5, 5, 4, 4, 3, 2, 2, 2, 1, 2, 2, 3, 3, 4, 5, 5, 5, 5, 4, 3, 2,
-    2, 2, 2, 1, 1, 2, 2, 3, 4, 4, 5, 5, 4, 4, 3, 2, 2, 2, 2, 1, 1, 2, 2, 3, 3,
-    3, 4, 4, 4, 3, 3, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2,
-    1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2,
-    2, 2, 1, 1, 1, 1, 1, 1,
+    [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1],
+    [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1],
+    [1, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1],
+    [2, 2, 3, 3, 4, 4, 3, 4, 3, 3, 2, 2, 2, 2, 1, 1],
+    [2, 2, 3, 4, 8, 8, 4, 4, 3, 4, 4, 3, 2, 2, 1, 1],
+    [2, 3, 3, 4, 16, 16, 16, 16, 4, 16, 5, 4, 3, 2, 2, 1],
+    [2, 3, 4, 5, 16, 9, 9, 8, 4, 16, 8, 5, 4, 3, 2, 1],
+    [2, 3, 4, 5, 5, 8, 8, 16, 9, 8, 8, 5, 4, 3, 2, 1],
+    [2, 3, 3, 4, 5, 5, 8, 8, 8, 8, 5, 4, 3, 2, 2, 2],
+    [2, 2, 3, 3, 4, 5, 8, 5, 5, 5, 4, 4, 3, 2, 2, 2],
+    [1, 2, 2, 3, 3, 4, 5, 5, 5, 5, 4, 3, 2, 2, 2, 2],
+    [1, 1, 2, 2, 3, 4, 4, 5, 5, 4, 4, 3, 2, 2, 2, 2],
+    [1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 3, 3, 2, 2, 2, 2],
+    [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 1],
+    [1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1],
+    [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1],
 ];
-
-const mapSize = Math.floor(Math.sqrt(mapData.length));
+const [mapSizeH, mapSizeW] = [mapData.length, mapData[0].length];
 
 const createTile = (x, y, tileId) => {
     let div = getCell(y, x);
@@ -47,8 +57,8 @@ const getCell = (y, x) => {
         cell = document.createElement("div");
         cell.classList.add("row-" + y);
         cell.classList.add("col-" + x);
-        transformY = "translateY(" + y * 5 + "em)";
-        transformX = "translateX(" + x * 5 + "em)";
+        transformY = "translateY(" + y * GAP_Y + "em)";
+        transformX = "translateX(" + x * GAP_X + "em)";
         cell.style.transform = `${transformX} ${transformY}`;
         mapGrid.appendChild(cell);
     }
@@ -104,7 +114,7 @@ const setMapPosition = (x, y) => {
 
     const tile = document.querySelector(".tile");
     const tableW = 0;
-    const tableH = (tile.offsetHeight * mapSize) / 10;
+    const tableH = -(tile.offsetHeight * mapSizeH) / 3;
 
     mapGrid.style.setProperty(
         "top",
@@ -118,13 +128,9 @@ const setMapPosition = (x, y) => {
 
 function init() {
     // create map
-    for (let y = 0; y < mapSize; y++) {
-        for (let x = 0; x < mapSize; x++) {
-            setTile(
-                x, // - mapSize / 2,
-                y, // - mapSize / 2,
-                mapData[y * mapSize + x] - 1
-            );
+    for (let y = 0; y < mapData.length; y++) {
+        for (let x = 0; x < mapData[y].length; x++) {
+            setTile(x, y, mapData[y][x] - 1);
         }
     }
 
@@ -155,34 +161,36 @@ function init() {
     });
 
     // scaling from https://codepen.io/iwillwen/pen/PMNjBW?html-preprocessor=none
-    let scale = 1;
+    let zoom = 1;
     let scaleTimeOut;
     let deltaY = 0;
+    // A delay is created before changes are made. If user inputs again it cancels previous call.
     window.addEventListener(
         "wheel",
         (e) => {
             e.preventDefault();
             clearTimeout(scaleTimeOut);
             deltaY += e.deltaY;
+            deltaY = Math.min(Math.max(50, Math.abs(deltaY)), 400); // Restrict deltaY
+            deltaY = deltaY * Math.sign(e.deltaY); // Normalize scroll wheel
+            zoom -= deltaY / 10000;
+            zoom = Math.min(Math.max(MIN_ZOOM, zoom), MAX_ZOOM); // Limit scale
+            h1.textContent = "Zoom: " + Math.round(zoom * 100) + "%";
             scaleTimeOut = setTimeout(() => {
-                deltaY = Math.min(Math.max(100, Math.abs(deltaY)), 600); // Restrict deltaY
-                deltaY = deltaY * Math.sign(e.deltaY); // Normalize scroll wheel
-                scale -= deltaY / 300;
-                scale = Math.min(Math.max(0.4, scale), 2.2); // Limit scale
-                mapGrid.style.scale = scale;
+                mapGrid.style.setProperty("scale", zoom);
                 deltaY = 0;
-            }, 20);
+            }, 100);
         },
         { passive: false }
     );
 
-    let x = -1 * (mapSize / 2);
-    let y = -1 * (mapSize / 2);
+    let x = -1 * (mapSizeW / 2);
+    let y = -1 * (mapSizeH / 2);
 
     const func = () => {
         for (let i = 0; i < 30; i++) {
-            x = Math.floor(Math.random() * mapSize); // - mapSize / 2;
-            y = Math.floor(Math.random() * mapSize); // - mapSize / 2;
+            x = Math.floor(Math.random() * mapSizeW);
+            y = Math.floor(Math.random() * mapSizeH);
             const tile = getTile(x, y);
 
             if (tile.classList.contains("hide")) {
@@ -197,7 +205,7 @@ function init() {
 init();
 setTimeout(() => setMapPosition(0, 0), 1000);
 
-// window.addEventListener("resize", (e) => setMapPosition(0, 0));
+window.addEventListener("resize", (e) => setMapPosition(0, 0));
 
 document.querySelectorAll(".tile").forEach((el) =>
     el.addEventListener("click", (e) => {
@@ -226,3 +234,14 @@ document.querySelectorAll(".tile").forEach((el) =>
         }
     })
 );
+
+function createArray(num, dimensions) {
+    var array = [];
+    for (var i = 0; i < dimensions; i++) {
+        array.push([]);
+        for (var j = 0; j < dimensions; j++) {
+            array[i].push(num);
+        }
+    }
+    return array;
+}
