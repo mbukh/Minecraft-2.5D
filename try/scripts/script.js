@@ -4,7 +4,7 @@
 // refactored for vanilla js by MBUKH.DEV
 
 const mapsContainer = document.querySelector("#mapsContainer");
-const h1 = document.querySelector("h1");
+const zoom = document.querySelector("h2 > span");
 const mapPosition = {};
 const tileTemplate = document.querySelector("body>.tile").cloneNode(true);
 document.querySelector("body>.tile").remove(); // remove template
@@ -16,46 +16,9 @@ const LAYERS_GAP = 2.7;
 let screenReadyToDrag = false;
 let screenDragging = false;
 
-const mapData = [
-    [
-        [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1],
-        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1],
-        [1, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1],
-        [2, 2, 3, 3, 4, 4, 3, 4, 3, 3, 2, 2, 2, 2, 1, 1],
-        [2, 2, 3, 4, 8, 8, 4, 4, 3, 4, 4, 3, 2, 2, 1, 1],
-        [2, 3, 3, 4, 16, 16, 16, 16, 4, 16, 5, 4, 3, 2, 2, 1],
-        [2, 3, 4, 5, 16, 9, 9, 8, 4, 16, 8, 5, 4, 3, 2, 1],
-        [2, 3, 4, 5, 5, 8, 8, 16, 9, 8, 8, 5, 4, 3, 2, 1],
-        [2, 3, 3, 4, 5, 5, 8, 8, 8, 8, 5, 4, 3, 2, 2, 2],
-        [2, 2, 3, 3, 4, 5, 8, 5, 5, 5, 4, 4, 3, 2, 2, 2],
-        [1, 2, 2, 3, 3, 4, 5, 5, 5, 5, 4, 3, 2, 2, 2, 2],
-        [1, 1, 2, 2, 3, 4, 4, 5, 5, 4, 4, 3, 2, 2, 2, 2],
-        [1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 3, 3, 2, 2, 2, 2],
-        [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 1],
-        [1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1],
-        [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1],
-    ],
-    [
-        [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1],
-        [1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 1],
-        [1, 1, 2, 2, 3, 3, 3, 4, 4, 4, 3, 3, 2, 2, 2, 2],
-        [1, 1, 2, 2, 3, 4, 4, 5, 5, 4, 4, 3, 2, 2, 2, 2],
-        [1, 2, 2, 3, 3, 4, 5, 5, 5, 5, 4, 3, 2, 2, 2, 2],
-        [2, 2, 3, 3, 4, 5, 8, 5, 5, 5, 4, 4, 3, 2, 2, 2],
-        [2, 3, 3, 4, 5, 5, 8, 8, 8, 8, 5, 4, 3, 2, 2, 2],
-        [2, 3, 4, 5, 5, 8, 8, 16, 9, 8, 8, 5, 4, 3, 2, 1],
-        [2, 3, 4, 5, 16, 9, 9, 8, 4, 16, 8, 5, 4, 3, 2, 1],
-        [2, 3, 3, 4, 16, 16, 16, 16, 4, 16, 5, 4, 3, 2, 2, 1],
-        [2, 2, 3, 4, 8, 8, 4, 4, 3, 4, 4, 3, 2, 2, 1, 1],
-        [2, 2, 3, 3, 4, 4, 3, 4, 3, 3, 2, 2, 2, 2, 1, 1],
-        [1, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1],
-        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1],
-    ],
-];
-const [mapSizeH, mapSizeW] = [mapData.length, mapData[0].length];
-
+// ===============================================================
+// ===============================================================
+// Tiles creation
 const createTile = (x, y, layer, tileId) => {
     const cell = getCell(y, x, layer);
     let tile = cell.querySelector(".tile");
@@ -141,6 +104,9 @@ const showTile = (x, y, layer) => {
 //     }
 // };
 
+// ===============================================================
+// ===============================================================
+// Map reposition
 const setMapPosition = (x, y) => {
     mapPosition.x = x;
     mapPosition.y = y;
@@ -164,12 +130,15 @@ const setMapPosition = (x, y) => {
     );
 };
 
+// ===============================================================
+// ===============================================================
+// Init
 function init() {
     // create map
     for (let layer = 0; layer < mapData.length; layer++) {
         for (let y = 0; y < mapData[layer].length; y++) {
             for (let x = 0; x < mapData[layer][y].length; x++) {
-                setTile(x, y, layer, mapData[layer][y][x] - 1);
+                setTile(x, y, layer, mapData[layer][y][x]);
             }
         }
     }
@@ -177,6 +146,7 @@ function init() {
     var mousePos = {};
     var mapPos = {};
 
+    // Move map by mouse
     document.addEventListener("mousedown", (e) => {
         mousePos.x = e.pageX;
         mousePos.y = e.pageY;
@@ -187,6 +157,7 @@ function init() {
 
     document.addEventListener("mousemove", (e) => {
         if (screenReadyToDrag) {
+            e.preventDefault();
             setMapPosition(
                 mapPos.x + (e.pageX - mousePos.x),
                 mapPos.y + (e.pageY - mousePos.y)
@@ -194,14 +165,14 @@ function init() {
             setTimeout(() => (screenDragging = true), 100);
         }
     });
-
+    // Cancel map move on mouse up
     document.addEventListener("mouseup", (e) => {
         screenReadyToDrag = false;
         setTimeout(() => (screenDragging = false), 100);
     });
 
     // scaling from https://codepen.io/iwillwen/pen/PMNjBW?html-preprocessor=none
-    let zoom = 1;
+    let scale = 1;
     let scaleTimeOut;
     let deltaY = 0;
     // A delay is created before changes are made. If user inputs again it cancels previous call.
@@ -213,11 +184,11 @@ function init() {
             deltaY += e.deltaY;
             deltaY = Math.min(Math.max(50, Math.abs(deltaY)), 400); // Restrict deltaY
             deltaY = deltaY * Math.sign(e.deltaY); // Normalize scroll wheel
-            zoom -= deltaY / 10000;
-            zoom = Math.min(Math.max(MIN_ZOOM, zoom), MAX_ZOOM); // Limit scale
-            h1.textContent = "Zoom: " + Math.round(zoom * 100) + "%";
+            scale -= deltaY / 10000;
+            scale = Math.min(Math.max(MIN_ZOOM, scale), MAX_ZOOM); // Limit scale
+            zoom.textContent = Math.round(scale * 100);
             scaleTimeOut = setTimeout(() => {
-                mapsContainer.style.setProperty("scale", zoom);
+                mapsContainer.style.setProperty("scale", scale);
                 deltaY = 0;
             }, 100);
         },
@@ -243,38 +214,99 @@ function init() {
     };
     setInterval(func, 300);
 }
-
-//start
 init();
 setTimeout(() => setMapPosition(0, 0), 1000);
 
+// ===============================================================
+// ===============================================================
+// Events
 window.addEventListener("resize", (e) => setMapPosition(0, 0));
 
 document.querySelectorAll(".tile").forEach((el) =>
     el.addEventListener("click", (e) => {
-        if (screenDragging) return;
-        console.log("clicked");
-        /* Act on the event */
-        e.currentTarget.classList.add("hide");
-        e.currentTarget.style.opacity = "";
+        // Disable while move map or if no tool selected
+        if (screenDragging || !currentTool) return;
+        if (currentTool["builds"]) {
+            // Build Action
+            return;
+        } else if (currentTool.canDestroy.length) {
+            // Destroy Action
+
+            if (e.target.style.classList?.includes("hide")) {
+                console.log("no block here");
+                return;
+            }
+            // get block by tileId
+            const expression = new RegExp("tile-(\\d+)", "i");
+            const targetBlockId = expression.exec(e.target.className)[1];
+            const targetBlock = Object.entries(blocks).find(
+                (block) => block[1].id == Number(targetBlockId)
+            )[1];
+            // Check if a tool can destroy it
+            if (targetBlock && currentTool.canDestroy.includes(targetBlock)) {
+                e.currentTarget.classList.add("hide");
+                e.currentTarget.style.opacity = "";
+            } else
+                console.log(
+                    `${currentTool.name} cannot destroy ${targetBlock.name}`
+                );
+        }
     })
 );
 
-// MAP GENERATOR
+// ===============================================================
+// ===============================================================
+// Map generator
 
 function createArray({ layers, cols, rows }) {
-    var array = [];
-    for (let layers = 0; layers < layers; layers++) {
-        for (var i = 0; i < cols; i++) {
-            array.push([]);
-            for (var j = 0; j < dimensions; j++) {
-                array[i].push(num);
-            }
-        }
-    }
+    var array = Array(layers).fill(Array(cols).fill(Array(rows).fill(0)));
     return array;
 }
 
 function generateMap() {
-    let map = createArray(0, 10);
+    const layers = rand(2, 4);
+    const cols = rand(12, 16);
+    const rows = rand(12, 16);
+    const mapData = createArray({ layers, cols, rows });
+    const heightMap = mapData[0];
+
+    // perlin noise function
+
+    // let t = 0;
+    // for (let y = 0; y < mapData[0].length; y++) {
+    //     for (let x = 0; x < mapData[0].length; x++) {
+    //         const noiseNumber = noise.simplex3(x+t, y+t, Date.now());
+    //         const res = (noiseNumber + 0.5) * Object.keys(tiles).length;
+    //         heightMap[y][x] = res;
+    //         t++;
+    //     }
+    // }
+
+    // mapData[0].forEach((col, cId) => {
+    //     col.forEach((row, rId) => {});
+    // });
+
+    // console.table(heightMap);
+}
+
+// ===============================================================
+// ===============================================================
+// Utils
+
+function rand(min, max = undefined) {
+    if (typeof min === "number" && typeof max === "number") {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + 1) + min;
+    }
+    if (Array.isArray(min) && max === undefined) {
+        return min[Math.floor(Math.random() * min.length)];
+    }
+}
+
+function mapToRange(a1, b1, a2, b2, t) {
+    const lerp = (a, b, t) => (b - a) * t + a;
+    const unlerp = (a, b, t) => (t - a) / (b - a);
+    const map = (a1, b1, a2, b2, t) => lerp(a2, b2, unlerp(a1, b1, t));
+    return map(a1, b1, a2, b2, t);
 }

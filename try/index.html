@@ -6,7 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <!-- <script src="./script/perlin.js"></script> -->
+    <!-- <script src="./script/perlin_3d.js"></script> -->
+    <script src="./scripts/mapsGen.js" defer></script>
+    <script src="./scripts/blocks.js" defer></script>
+    <script src="./scripts/tools.js" defer></script>
+    <script src="./scripts/script.js" defer></script>
     <title>Document</title>
 
 </head>
@@ -15,7 +20,20 @@
     <!-- <center>Tileset made by <a target="_blank"
             href="http://spasquini.deviantart.com/art/Isometric-new-tiles-274882986">spasquini</a>
     </center> -->
-    <h1>Zoom:</h1>
+    <h2>Scroll to zoom: <span>100</span>%</h2>
+    <div id="tools">
+        <div id="shovel" class="tool shovel"></div>
+        <div id="axe" class="tool axe"></div>
+        <div id="pickaxe" class="tool pickaxe"></div>
+        <div id="bucket" class="tool bucket"></div>
+        <div id="water" class="tool water"></div>
+        <div id="shore" class="tool shore"></div>
+        <div id="sand" class="tool sand"></div>
+        <div id="grass" class="tool grass"></div>
+        <div id="dirt" class="tool dirt"></div>
+        <div id="snow" class="tool snow"></div>
+        <div id="stone" class="tool stone"></div>
+    </div>
 
     <div id="mapsContainer">
     </div>

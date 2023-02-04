@@ -5,9 +5,71 @@
 }
 
 body {
+    --cursor: move;
     background: #cbf0ff;
-    /* overflow: hidden; */
+    overflow: hidden;
     display: flex;
+}
+
+#tools {
+    --count-tools: 11;
+    position: fixed;
+    z-index: 1000000;
+    bottom: 1em;
+    left: 50%;
+    transform: translateX(-50%);
+    aspect-ratio: var(--count-tools) / 1;
+    height: 4em;
+    border: 2px solid #cccc;
+    display: flex;
+    background: #0005;
+}
+#tools .tool {
+    flex: 1;
+    height: 100%;
+    border: 3px solid #cccc;
+    background: var(--tool-image) no-repeat center center / 70%;
+    cursor: pointer;
+}
+#tools .tool:hover {
+    background-color: #fff5;
+}
+#tools .tool.active {
+    border-color: #fffc;
+    background-color: #fffc;
+}
+#tools .tool.shovel {
+    --tool-image: url(./tools/shovel.png);
+}
+#tools .tool.axe {
+    --tool-image: url(./tools/axe.png);
+}
+#tools .tool.pickaxe {
+    --tool-image: url(./tools/pickaxe.png);
+}
+#tools .tool.bucket {
+    --tool-image: url(./tools/bucket.png);
+}
+#tools .tool.water {
+    --tool-image: url(./blocks/water.png);
+}
+#tools .tool.shore {
+    --tool-image: url(./blocks/shore.png);
+}
+#tools .tool.sand {
+    --tool-image: url(./blocks/sand.png);
+}
+#tools .tool.grass {
+    --tool-image: url(./blocks/grass.png);
+}
+#tools .tool.dirt {
+    --tool-image: url(./blocks/dirt.png);
+}
+#tools .tool.snow {
+    --tool-image: url(./blocks/snow.png);
+}
+#tools .tool.stone {
+    --tool-image: url(./blocks/stone.png);
 }
 #mapsContainer {
     --tile-scale: 13;
@@ -24,20 +86,21 @@ body {
     display: block;
     position: absolute;
     transform: rotateX(60deg) rotateZ(45deg);
+    z-index: 1000;
 }
 .mapLayer > div {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
     width: 0;
     height: 0;
 }
 
 .tile {
-    /* border: 1px solid red;
-    background-color: #f775; */
+    /* border: 1px solid red; */
+    /* background-color: #f775; */
     /* mouse fix x:y 0px-32px */
-    --offset-cursor: 0 0;
+    position: absolute;
     transform: translate3d(0em, 0em, 0em);
     width: 3.5em;
     height: 3.5em;
@@ -53,6 +116,7 @@ body {
 }
 
 .tile > div {
+    /* border: 1px solid red; */
     transform: rotateZ(-45deg) rotateY(-60deg)
         translate3d(-4.1em, -3.3em, -3.1em);
     width: 10em;
@@ -61,79 +125,77 @@ body {
     /* default sprite */
     /* http://img14.deviantart.net/f99b/i/2011/354/d/5/isometric_new_tiles_by_spasquini-d4jnp2i.png */
     background-image: url(./tiles-solid.png);
-    background-position: -6px 0px;
+    background-position: calc(
+        var(--tile-offset) - calc(var(--tile-index) - 1) * var(--tile-size)
+    );
     background-repeat: no-repeat;
     image-rendering: pixelated;
-    cursor: url("./axe-cursor.png") var(--offset-cursor), pointer;
     transition: height;
     transition-delay: 0;
+    cursor: var(--cursor), pointer;
 }
 .tile.hide > div {
     height: 0;
     transition-delay: 1s;
 }
-.tile > div.tile-0 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 0)) 0px;
-}
-
 .tile > div.tile-1 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 1)) 0px;
+    --tile-index: 1;
 }
 
 .tile > div.tile-2 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 2)) 0px;
+    --tile-index: 2;
 }
 
 .tile > div.tile-3 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 3)) 0px;
+    --tile-index: 3;
 }
 
 .tile > div.tile-4 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 4)) 0px;
+    --tile-index: 4;
 }
 
 .tile > div.tile-5 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 5)) 0px;
+    --tile-index: 5;
 }
 
 .tile > div.tile-6 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 6)) 0px;
+    --tile-index: 6;
 }
 
 .tile > div.tile-7 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 7)) 0px;
+    --tile-index: 7;
 }
 
 .tile > div.tile-8 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 8)) 0px;
+    --tile-index: 8;
 }
 
 .tile > div.tile-9 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 9)) 0px;
+    --tile-index: 9;
 }
 
 .tile > div.tile-10 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 10)) 0px;
+    --tile-index: 10;
 }
 
 .tile > div.tile-11 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 11)) 0px;
+    --tile-index: 11;
 }
 
 .tile > div.tile-12 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 12)) 0px;
+    --tile-index: 12;
 }
 
 .tile > div.tile-13 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 13)) 0px;
+    --tile-index: 13;
 }
 
 .tile > div.tile-14 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 14)) 0px;
+    --tile-index: 14;
 }
 
 .tile > div.tile-15 {
-    background-position: calc(var(--tile-offset) - (var(--tile-size) * 15)) 0px;
+    --tile-index: 15;
 }
 
 /* Animations */
