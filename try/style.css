@@ -38,46 +38,14 @@ body {
     border-color: #fffc;
     background-color: #fffc;
 }
-#tools .tool.shovel {
-    --tool-image: url(./tools/shovel.png);
-}
-#tools .tool.axe {
-    --tool-image: url(./tools/axe.png);
-}
-#tools .tool.pickaxe {
-    --tool-image: url(./tools/pickaxe.png);
-}
-#tools .tool.bucket {
-    --tool-image: url(./tools/bucket.png);
-}
-#tools .tool.water {
-    --tool-image: url(./blocks/water.png);
-}
-#tools .tool.shore {
-    --tool-image: url(./blocks/shore.png);
-}
-#tools .tool.sand {
-    --tool-image: url(./blocks/sand.png);
-}
-#tools .tool.grass {
-    --tool-image: url(./blocks/grass.png);
-}
-#tools .tool.dirt {
-    --tool-image: url(./blocks/dirt.png);
-}
-#tools .tool.snow {
-    --tool-image: url(./blocks/snow.png);
-}
-#tools .tool.stone {
-    --tool-image: url(./blocks/stone.png);
-}
+
 #mapsContainer {
     --tile-scale: 13;
     --tile-offset: 0px * var(--tile-scale); /* default 0.4px */
     --tile-size: 162px;
     position: absolute;
     left: 50%;
-    top: 25%;
+    top: 15%;
     scale: 1;
     transition: scale 0.3s ease-in-out;
 }
@@ -196,6 +164,40 @@ body {
 
 .tile > div.tile-15 {
     --tile-index: 15;
+}
+
+#tools .tool.shovel {
+    --tool-image: url(./tools/shovel.png);
+}
+#tools .tool.axe {
+    --tool-image: url(./tools/axe.png);
+}
+#tools .tool.pickaxe {
+    --tool-image: url(./tools/pickaxe.png);
+}
+#tools .tool.bucket {
+    --tool-image: url(./tools/bucket.png);
+}
+#tools .tool.water {
+    --tool-image: url(./blocks/water.png);
+}
+#tools .tool.shore {
+    --tool-image: url(./blocks/shore.png);
+}
+#tools .tool.sand {
+    --tool-image: url(./blocks/sand.png);
+}
+#tools .tool.grass {
+    --tool-image: url(./blocks/grass.png);
+}
+#tools .tool.dirt {
+    --tool-image: url(./blocks/dirt.png);
+}
+#tools .tool.snow {
+    --tool-image: url(./blocks/snow.png);
+}
+#tools .tool.stone {
+    --tool-image: url(./blocks/stone.png);
 }
 
 /* Animations */

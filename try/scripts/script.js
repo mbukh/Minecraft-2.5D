@@ -135,9 +135,9 @@ const setMapPosition = (x, y) => {
 // Init
 function init() {
     // create map
-    for (let layer = 0; layer < mapData.length; layer++) {
-        for (let y = 0; y < mapData[layer].length; y++) {
-            for (let x = 0; x < mapData[layer][y].length; x++) {
+    for (let layer = 0; layer < mapSizeZ; layer++) {
+        for (let y = 0; y < mapSizeY; y++) {
+            for (let x = 0; x < mapSizeX; x++) {
                 setTile(x, y, layer, mapData[layer][y][x]);
             }
         }
@@ -195,15 +195,15 @@ function init() {
         { passive: false }
     );
 
-    let x = -1 * (mapSizeW / 2);
-    let y = -1 * (mapSizeH / 2);
+    let x = -1 * (mapSizeX / 2);
+    let y = -1 * (mapSizeY / 2);
 
     // Auto tiles-resetter
     const func = () => {
-        for (let layer = 0; layer < 1; layer++) {
+        for (let layer = 0; layer < mapSizeZ; layer++) {
             for (let i = 0; i < 30; i++) {
-                x = Math.floor(Math.random() * mapSizeW);
-                y = Math.floor(Math.random() * mapSizeH);
+                x = Math.floor(Math.random() * mapSizeX);
+                y = Math.floor(Math.random() * mapSizeY);
                 const tile = getTile(x, y, layer);
 
                 if (tile.classList.contains("hide")) {
@@ -226,26 +226,54 @@ document.querySelectorAll(".tile").forEach((el) =>
     el.addEventListener("click", (e) => {
         // Disable while move map or if no tool selected
         if (screenDragging || !currentTool) return;
+
+        // Tak action
+        const blockDiv = el.parentElement;
+        const tileInnerDiv = e.target;
+
+        // get click position relative to the element center
+        // https://stackoverflow.com/questions/3234256/find-mouse-position-relative-to-element/42111623#42111623
+        const rect = tileInnerDiv.getBoundingClientRect();
+        var clickX = e.clientX - rect.left - rect.width / 2;
+        var clickY = e.clientY - rect.top - rect.height / 2;
+        console.table([clickX, clickY]);
+
         if (currentTool["builds"]) {
             // Build Action
+            // get block by coordinate
+            const regLayer = new RegExp("layer-(\\d+)", "i");
+            const regY = new RegExp("y-(\\d+)", "i");
+            const regX = new RegExp("x-(\\d+)", "i");
+            const originLayer = regLayer.exec(blockDiv.className)[1];
+            const originY = regY.exec(blockDiv.className)[1];
+            const originX = regX.exec(blockDiv.className)[1];
+
+            const regTile = new RegExp("tile-(\\d+)", "i");
+            const targetBlockId = expression.exec(e.target.className)[1];
+
+            console.log(originLayer);
+            console.log(originY);
+            console.log(originX);
+            // Prepare a new block
+            setTile(originX, originY, originLayer + 1);
             return;
         } else if (currentTool.canDestroy.length) {
             // Destroy Action
 
-            if (e.target.style.classList?.includes("hide")) {
+            if (e.target.style.classList?.contains("hide")) {
                 console.log("no block here");
                 return;
             }
             // get block by tileId
-            const expression = new RegExp("tile-(\\d+)", "i");
-            const targetBlockId = expression.exec(e.target.className)[1];
+            const regTile = new RegExp("tile-(\\d+)", "i");
+            const targetBlockId = regTile.exec(e.target.className)[1];
             const targetBlock = Object.entries(blocks).find(
                 (block) => block[1].id == Number(targetBlockId)
             )[1];
             // Check if a tool can destroy it
             if (targetBlock && currentTool.canDestroy.includes(targetBlock)) {
-                e.currentTarget.classList.add("hide");
-                e.currentTarget.style.opacity = "";
+                el.classList.add("hide");
+                el.style.opacity = "";
             } else
                 console.log(
                     `${currentTool.name} cannot destroy ${targetBlock.name}`
@@ -253,60 +281,3 @@ document.querySelectorAll(".tile").forEach((el) =>
         }
     })
 );
-
-// ===============================================================
-// ===============================================================
-// Map generator
-
-function createArray({ layers, cols, rows }) {
-    var array = Array(layers).fill(Array(cols).fill(Array(rows).fill(0)));
-    return array;
-}
-
-function generateMap() {
-    const layers = rand(2, 4);
-    const cols = rand(12, 16);
-    const rows = rand(12, 16);
-    const mapData = createArray({ layers, cols, rows });
-    const heightMap = mapData[0];
-
-    // perlin noise function
-
-    // let t = 0;
-    // for (let y = 0; y < mapData[0].length; y++) {
-    //     for (let x = 0; x < mapData[0].length; x++) {
-    //         const noiseNumber = noise.simplex3(x+t, y+t, Date.now());
-    //         const res = (noiseNumber + 0.5) * Object.keys(tiles).length;
-    //         heightMap[y][x] = res;
-    //         t++;
-    //     }
-    // }
-
-    // mapData[0].forEach((col, cId) => {
-    //     col.forEach((row, rId) => {});
-    // });
-
-    // console.table(heightMap);
-}
-
-// ===============================================================
-// ===============================================================
-// Utils
-
-function rand(min, max = undefined) {
-    if (typeof min === "number" && typeof max === "number") {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min) + 1) + min;
-    }
-    if (Array.isArray(min) && max === undefined) {
-        return min[Math.floor(Math.random() * min.length)];
-    }
-}
-
-function mapToRange(a1, b1, a2, b2, t) {
-    const lerp = (a, b, t) => (b - a) * t + a;
-    const unlerp = (a, b, t) => (t - a) / (b - a);
-    const map = (a1, b1, a2, b2, t) => lerp(a2, b2, unlerp(a1, b1, t));
-    return map(a1, b1, a2, b2, t);
-}
