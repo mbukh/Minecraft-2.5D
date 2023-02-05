@@ -1,0 +1,181 @@
+html,
+body {
+    padding: 0px;
+    margin: 0px;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    perspective: 2000px;
+    perspective-origin: center;
+    background: white;
+    color: #222;
+}
+
+* {
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+/* panel */
+.panel {
+    position: absolute;
+    transform-style: preserve-3d;
+    top: 60%;
+    left: 50%;
+    padding: 10px;
+    transform: translate(-50%, -50%);
+}
+
+.panel,
+.panel::before,
+.panel::after {
+    background: rgba(80, 120, 190, 0.2);
+    border: 1px solid black;
+}
+
+.panel::before,
+.panel::after {
+    position: absolute;
+    display: block;
+    content: "";
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    opacity: 0.6;
+}
+
+.panel::before {
+    transform: translateZ(-25px);
+}
+
+.panel::after {
+    transform: translateZ(-50px);
+}
+
+.panel > * {
+    transform: translateZ(10px);
+    transform-style: preserve-3d;
+}
+
+.panel .panel-header {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    text-align: center;
+    padding: 5px 0px 5px 0px;
+    border: 1px solid black;
+}
+
+.panel .panel-body {
+    padding: 20px 10px 20px 10px;
+    min-width: 380px;
+    min-height: 100px;
+}
+
+.right {
+    float: right;
+}
+
+/* buttons */
+.btn {
+    background: none;
+    border: 1px solid black;
+    cursor: pointer;
+    padding: 10px 20px 10px 20px;
+    transition: all 0.2s;
+    margin: 5px;
+    outline: none;
+}
+
+.btn-hover-success:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.panel .btn.btn-close {
+    position: absolute;
+    content: "&times";
+    font-size: 2em;
+    padding: 0px;
+    right: 10px;
+    top: 5px;
+    border: none;
+    margin: 0px;
+}
+
+/* title */
+h1 {
+    margin: 0px;
+}
+
+/* form */
+fieldset {
+    padding: 0px;
+    margin-bottom: 20px;
+    border: 1px solid black;
+    transition: all 0.2s;
+}
+
+fieldset:hover,
+fieldset:focus,
+fieldset:active {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 0px 5px 5px 5px;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    text-align: center;
+    outline: none;
+}
+
+/* checkbox */
+input[type="checkbox"] {
+    display: none;
+}
+
+input[type="checkbox"] + label {
+    cursor: pointer;
+    padding-left: 2.3em;
+}
+
+input[type="checkbox"] + label::after {
+    content: "";
+    opacity: 0;
+    position: absolute;
+    left: 0.75em;
+    width: 0.8em;
+    height: 0.4em;
+    background: transparent;
+    border: 2px solid black;
+    border-top: none;
+    border-right: none;
+    transform: translateX(0.4em) translateY(0.15em) rotate(-45deg);
+    transition: all 0.2s;
+}
+
+input[type="checkbox"]:checked + label::after {
+    opacity: 1;
+}
+
+input[type="checkbox"] + label::before {
+    content: "";
+    position: absolute;
+    left: 0.75em;
+    width: 1.5em;
+    height: 1.5em;
+    background: none;
+    transform: translateY(-0.25em);
+    border: 1px solid black;
+    transition: all 0.2s;
+}
+
+input[type="checkbox"]:hover + label::before,
+input[type="checkbox"] + label:hover::before {
+    background: rgba(0, 0, 0, 0.2);
+}

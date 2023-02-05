@@ -5,7 +5,7 @@
 // more about islands, trees, mountains, terraces
 // https://www.redblobgames.com/maps/terrain-from-noise/#elevation-redistribution
 
-mapData = generateMap();
+mapData = generateMap(Math.random() * 10000);
 
 [mapSizeZ, mapSizeY, mapSizeX] = [
     mapData.length,
@@ -15,7 +15,7 @@ mapData = generateMap();
 
 function generateMap(seed = 1) {
     const layers = 3;
-    const cols = rand(8, 19);
+    const cols = rand(6, 19);
     const rows = cols;
     const genMap = createArray({ layers, cols, rows });
     const heightMap = genMap[0];

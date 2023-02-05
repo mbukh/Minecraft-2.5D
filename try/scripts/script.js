@@ -137,8 +137,8 @@ const setMapPosition = (x, y) => {
 // ===============================================================
 // ===============================================================
 // Init
-
 init();
+
 function init() {
     // create map
     for (let layer = 0; layer < mapSizeZ; layer++) {
