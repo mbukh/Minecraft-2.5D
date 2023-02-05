@@ -26,4 +26,6 @@ const blocks = {
     dirt: { name: "dirt", id: 7, over: [7, 9] },
     snow: { name: "snow", id: 8, over: [7, 9] },
     stone: { name: "stone", id: 9, near: [], over: [] },
+    lava: { name: "lava", id: 10, near: [], over: [] },
+    flowerPoppy: { name: "Poppy flower", id: 11, near: [], over: [] },
 };

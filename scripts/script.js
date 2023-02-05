@@ -17,6 +17,7 @@ const GAP_Y = 3.5;
 const LAYERS_GAP = 2.7;
 let screenReadyToDrag = false;
 let screenDragging = false;
+let currentTool = null;
 
 // ===============================================================
 // ===============================================================
@@ -167,7 +168,7 @@ function init() {
             }
         }
     };
-    // setInterval(func, 500);
+    setInterval(func, 5000);
 }
 
 // Centralize the map on load

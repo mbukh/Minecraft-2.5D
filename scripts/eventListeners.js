@@ -6,7 +6,6 @@ window.addEventListener("resize", (e) => setMapPosition(0, 0));
 
 function activateTools() {
     toolDivs.forEach((tool) => {
-        console.log("123");
         tool.addEventListener("mousedown", (e) => {
             const image = `./cursors/${tool.id}.png`;
             const toolName = tool.id;
@@ -90,7 +89,7 @@ function activateTiles() {
             const rect = tileInnerDiv.getBoundingClientRect();
             const clickX = e.clientX - rect.left - rect.width / 2;
             const clickY = e.clientY - rect.top - rect.height / 2;
-            console.table([clickX, clickY]);
+            console.log([clickX, clickY]);
 
             if (currentTool["builds"]) {
                 // Build Action

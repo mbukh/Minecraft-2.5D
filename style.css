@@ -92,7 +92,7 @@ body {
 }
 
 #tools {
-    --count-tools: 11;
+    --count-tools: 13;
     position: fixed;
     z-index: 99999;
     bottom: 1em;
@@ -211,6 +211,12 @@ body {
 }
 #tools .tool.stone {
     --tool-image: url(./blocks/stone.png);
+}
+#tools .tool.lava {
+    --tool-image: url(./blocks/lava.png);
+}
+#tools .tool.flowerPoppy {
+    --tool-image: url(./blocks/flowerPoppy.png);
 }
 
 /* Animations */
