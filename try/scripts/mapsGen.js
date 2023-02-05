@@ -15,7 +15,7 @@ mapData = generateMap();
 
 function generateMap(seed = 1) {
     const layers = 3;
-    const cols = rand(11, 19);
+    const cols = rand(8, 19);
     const rows = cols;
     const genMap = createArray({ layers, cols, rows });
     const heightMap = genMap[0];
@@ -49,10 +49,10 @@ function generateMap(seed = 1) {
     }
 
     genMap[layers - 1] = heightMap.map((row) =>
-        row.map((height) => (height > 7 ? height : 11))
+        row.map((height) => (height > 7 ? height : -1))
     );
     genMap[layers - 2] = heightMap.map((row) =>
-        row.map((height) => (height <= 7 && height > 4 ? height : 11))
+        row.map((height) => (height <= 7 && height > 4 ? height : -1))
     );
     genMap[layers - 3] = heightMap.map((row) =>
         row.map((height) => (height < 4 ? height : 4))

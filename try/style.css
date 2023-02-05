@@ -10,47 +10,18 @@ body {
     overflow: hidden;
     display: flex;
 }
-
-#tools {
-    --count-tools: 11;
-    position: fixed;
-    z-index: 1000000;
-    bottom: 1em;
-    left: 50%;
-    transform: translateX(-50%);
-    aspect-ratio: var(--count-tools) / 1;
-    height: 4em;
-    border: 2px solid #cccc;
-    display: flex;
-    background: #0005;
-}
-#tools .tool {
-    flex: 1;
-    height: 100%;
-    border: 3px solid #cccc;
-    background: var(--tool-image) no-repeat center center / 70%;
-    cursor: pointer;
-}
-#tools .tool:hover {
-    background-color: #fff5;
-}
-#tools .tool.active {
-    border-color: #fffc;
-    background-color: #fffc;
-}
-
 #mapsContainer {
     --tile-scale: 13;
     --tile-offset: 0px * var(--tile-scale); /* default 0.4px */
     --tile-size: 162px;
     position: absolute;
-    left: 50%;
-    top: 15%;
+    left: 0;
+    top: 0;
     scale: 1;
     transition: scale 0.3s ease-in-out;
 }
 
-.mapLayer {
+#mapsContainer .mapLayer {
     display: block;
     position: absolute;
     transform: rotateX(60deg) rotateZ(45deg);
@@ -78,9 +49,14 @@ body {
     opacity: 0.5;
 }
 .tile.hide {
-    transform: translate3d(20em, 20em, 0em);
+    transform: translate3d(100em, 100em, 0em);
     opacity: 0;
     transition: all 1s cubic-bezier(0.7, -0.4, 0.88, 0.51);
+}
+.tile.removed {
+    transform: translate3d(-100em, -100em, 0em);
+    opacity: 0;
+    transition: none;
 }
 
 .tile > div {
@@ -102,10 +78,40 @@ body {
     transition-delay: 0;
     cursor: var(--cursor), pointer;
 }
-.tile.hide > div {
+.tile.hide > div,
+.tile.removed > div {
     height: 0;
     transition-delay: 1s;
 }
+
+#tools {
+    --count-tools: 11;
+    position: fixed;
+    z-index: 99999;
+    bottom: 1em;
+    left: 50%;
+    transform: translateX(-50%);
+    aspect-ratio: var(--count-tools) / 1;
+    height: 4em;
+    border: 2px solid #cccc;
+    display: flex;
+    background: #0005;
+}
+#tools .tool {
+    flex: 1;
+    height: 100%;
+    border: 3px solid #cccc;
+    background: var(--tool-image) no-repeat center center / 70%;
+    cursor: pointer;
+}
+#tools .tool:hover {
+    background-color: #fff5;
+}
+#tools .tool.active {
+    border-color: #fffc;
+    background-color: #fffc;
+}
+
 .tile > div.tile-1 {
     --tile-index: 1;
 }
