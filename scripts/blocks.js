@@ -58,10 +58,83 @@ const blocks = {
     },
 };
 
-// const tiles = {};
-
-// Utils
-
 function findBlockById(tile) {
     return Object.values(blocks).find((block) => block.id === tile);
+}
+
+function makeTileActive(el) {
+    el.addEventListener("click", (e) => {
+        // Disable while move map or if no tool selected
+        if (screenDragging || !currentTool) return;
+
+        // el === e.currentTarget
+        const blockDiv = el.parentElement;
+        const tileInnerDiv = e.target;
+
+        // get block coordinates X, Y, Z
+        const regZ = new RegExp("layer-(\\d+)", "i");
+        const regY = new RegExp("y-(\\d+)", "i");
+        const regX = new RegExp("x-(\\d+)", "i");
+        const originZ = Number(regZ.exec(blockDiv.className)[1]);
+        const originY = Number(regY.exec(blockDiv.className)[1]);
+        const originX = Number(regX.exec(blockDiv.className)[1]);
+
+        if (currentTool["builds"]) {
+            // Build Action
+
+            // get click position relative to the element center
+            // https://stackoverflow.com/questions/3234256/find-mouse-position-relative-to-element/42111623#42111623
+            const rect = tileInnerDiv.getBoundingClientRect();
+            const clickX = e.clientX - rect.left - rect.width / 2;
+            const clickY = e.clientY - rect.top - rect.height / 2;
+            console.log([clickX, clickY]);
+
+            // Prepare a new block
+            if (!tileExistsOnMap(originX, originY, originZ + 1)) {
+                const newTile = setTile(
+                    originX,
+                    originY,
+                    originZ + 1,
+                    currentTool.builds.id
+                );
+                makeTileActive(newTile);
+                showTile(originX, originY, originZ + 1);
+                // Save data to the map
+                mapData[originZ + 1][originY][originX] = currentTool.builds.id;
+            } else console.log("can't build there");
+        } else if (currentTool.canDestroy.length) {
+            // Destroy Action
+
+            // if a hidden tile clicked
+            if (e.target.style.classList?.contains("hide")) {
+                console.log("no block here");
+                return;
+            }
+            // get block by tileId
+            const regTile = new RegExp("tile-(\\d+)", "i");
+            const targetBlockId = Number(regTile.exec(e.target.className)[1]);
+            const targetBlock = findBlockById(targetBlockId);
+            // Check if a tool can destroy it
+            if (targetBlock && currentTool.canDestroy.includes(targetBlock)) {
+                // Remove the block
+                el.classList.add("hide");
+                // Save data to the map
+                mapData[originZ][originY][originX] = null;
+                if (
+                    targetBlockId === blocks.shore.id &&
+                    currentTool === tools.bucket
+                ) {
+                    // Replace shore to sand with bucket
+                    e.target.classList.remove("tile-4");
+                    hideTile(originX, originY, originZ);
+                    e.target.classList.add("tile-5");
+                    setTimeout(() => showTile(originX, originY, originZ), 1000);
+                    mapData[originZ][originY][originX] = blocks.sand.id;
+                }
+            } else
+                console.log(
+                    `${currentTool.name} cannot destroy ${targetBlock.name}`
+                );
+        }
+    });
 }

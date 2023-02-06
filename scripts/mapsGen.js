@@ -7,31 +7,32 @@
 
 // TODO
 // IDEA: don't math floor to int value leave toFixes(1) ~ 0.5
+// sometimes there are uncontrolled empty places inside the island
 
 // Seed of randomization or use Math.random() * 10000
 const seed = Math.random() * 10000;
 // How much the island is over the see;
-const maxHeight = 6;
+const groundLevel = 6;
 const mapLayers = 5;
 const mapSize = [14, 14];
 
-const mapData = generateMap({ seed, maxHeight, mapLayers, mapSize });
+const mapData = generateMap({ seed, groundLevel, mapLayers, mapSize });
 const [mapSizeZ, mapSizeY, mapSizeX] = [
     mapData.length,
     mapData[0].length,
     mapData[0][0].length,
 ];
 
-function generateMap({ seed, maxHeight, mapLayers, mapSize }) {
+function generateMap({ seed, groundLevel, mapLayers, mapSize }) {
     const layers = mapLayers;
     const cols = mapSize[0];
     const rows = mapSize[1];
     const genMap = createArray({ layers, cols, rows });
-    const heightsMap = generateHeights(genMap, { seed, maxHeight });
+    const heightsMap = generateHeights(genMap, { seed, groundLevel });
     return heightsTo3dMap(heightsMap, genMap);
 }
 
-function generateHeights(targetMap, { seed = 1, maxHeight = 6 }) {
+function generateHeights(targetMap, { seed = 1, groundLevel = 6 }) {
     const heightsMap = targetMap[0];
     const [cols, rows] = [targetMap[0].length, targetMap[0][0].length];
     const tilesCount = Object.keys(blocks).length;
@@ -54,7 +55,7 @@ function generateHeights(targetMap, { seed = 1, maxHeight = 6 }) {
             let nx = (2 * x) / rows - 1;
             let ny = (2 * y) / cols - 1;
             res = Math.floor((res * 10 + 10) / 2);
-            res = (res + trigProduct(ny, nx) * 20) / 2 - 9 + maxHeight;
+            res = (res + trigProduct(ny, nx) * 20) / 2 - 9 + groundLevel;
             res = Math.max(0, Math.min(res, 10));
             res = Math.floor(mapToRange(0, 10, 1, tilesCount - 2, res)); // -2 to restrict from lava and flower
             heightsMap[x][y] = res;

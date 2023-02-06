@@ -75,7 +75,6 @@ const getTile = (x, y, layer) => {
 };
 
 const setTile = (x, y, layer, tileId) => {
-    console.log(x, y, layer, tileId);
     const tile = getTile(x, y, layer);
     const div = tile.querySelector("div");
     div.className = `tile-${tileId}`;
@@ -89,9 +88,9 @@ const setTile = (x, y, layer, tileId) => {
 //     `;
 // };
 
-// const hideTile = (x, y) => {
-//     getTile(x, y).classList.add("hide");
-// };
+const hideTile = (x, y, layer) => {
+    getTile(x, y, layer).classList.add("hide");
+};
 
 const showTile = (x, y, layer) => {
     getTile(x, y, layer).classList.remove("hide");
