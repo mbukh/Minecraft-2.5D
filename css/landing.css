@@ -16,6 +16,12 @@ body {
     font-weight: bold;
 }
 
+.landing {
+    width: 100vw;
+    height: 100vh;
+    background: url(../assets/background.webp) no-repeat 63% top / cover;
+}
+
 /* panel */
 .panel {
     position: absolute;
@@ -29,7 +35,7 @@ body {
 .panel,
 .panel::before,
 .panel::after {
-    background: rgba(80, 120, 190, 0.2);
+    background: rgba(169, 192, 231, 0.5);
     border: 1px solid black;
 }
 

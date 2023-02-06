@@ -7,7 +7,7 @@ window.addEventListener("resize", (e) => setMapPosition(0, 0));
 function activateTools() {
     toolDivs.forEach((tool) => {
         tool.addEventListener("mousedown", (e) => {
-            const image = `./cursors/${tool.id}.png`;
+            const image = `../cursors/${tool.id}.png`;
             const toolName = tool.id;
             document.body.style.setProperty("--cursor", `url(${image})`);
             toolDivs.forEach((tool) => tool.classList.remove("active"));
@@ -81,6 +81,7 @@ function activateTiles() {
             if (screenDragging || !currentTool) return;
 
             // Tak action
+            // el === e.currentTarget
             const blockDiv = el.parentElement;
             const tileInnerDiv = e.target;
 
@@ -119,17 +120,22 @@ function activateTiles() {
                 }
                 // get block by tileId
                 const regTile = new RegExp("tile-(\\d+)", "i");
-                const targetBlockId = regTile.exec(e.target.className)[1];
-                const targetBlock = Object.entries(blocks).find(
-                    (block) => block[1].id == Number(targetBlockId)
-                )[1];
+                const targetBlockId = Number(
+                    regTile.exec(e.target.className)[1]
+                );
+                const targetBlock = findBlockById(targetBlockId);
                 // Check if a tool can destroy it
                 if (
                     targetBlock &&
                     currentTool.canDestroy.includes(targetBlock)
                 ) {
                     el.classList.add("hide");
-                    el.style.opacity = "";
+                    if (targetBlockId === 4 && currentTool === tools.bucket) {
+                        // Replace shore to sand with bucket
+                        e.target.classList.remove("tile-4");
+                        e.target.classList.add("tile-5");
+                        el.classList.remove("hide");
+                    }
                 } else
                     console.log(
                         `${currentTool.name} cannot destroy ${targetBlock.name}`

@@ -6,7 +6,7 @@ function rand(min, max = undefined) {
     if (typeof min === "number" && typeof max === "number") {
         min = Math.ceil(min);
         max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min) + 1) + min;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
     if (Array.isArray(min) && max === undefined) {
         return min[Math.floor(Math.random() * min.length)];

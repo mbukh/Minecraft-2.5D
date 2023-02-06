@@ -5,13 +5,7 @@
 const tools = {
     shovel: {
         name: "shovel",
-        canDestroy: [
-            blocks.shore,
-            blocks.sand,
-            blocks.grass,
-            blocks.dirt,
-            blocks.snow,
-        ],
+        canDestroy: [blocks.sand, blocks.grass, blocks.dirt, blocks.snow],
     },
     axe: {
         name: "axe",
@@ -24,6 +18,7 @@ const tools = {
             blocks.waterDeep,
             blocks.waterShallow,
             blocks.water,
+            blocks.shore,
             blocks.lava,
         ],
     },

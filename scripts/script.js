@@ -78,7 +78,6 @@ const setTile = (x, y, layer, tileId) => {
     const tile = getTile(x, y, layer);
     const div = tile.querySelector("div");
     div.className = `tile-${tileId}`;
-    if (tileId < 0) div.parentElement.classList.add("removed");
 };
 
 // const setTileHeight = (x, y, height) => {
@@ -145,7 +144,8 @@ function init() {
     for (let layer = 0; layer < mapSizeZ; layer++) {
         for (let y = 0; y < mapSizeY; y++) {
             for (let x = 0; x < mapSizeX; x++) {
-                setTile(x, y, layer, mapData[layer][y][x]);
+                if (mapData[layer][y][x])
+                    setTile(x, y, layer, mapData[layer][y][x]);
             }
         }
     }
@@ -168,7 +168,7 @@ function init() {
             }
         }
     };
-    setInterval(func, 5000);
+    // setInterval(func, 5000);
 }
 
 // Centralize the map on load
