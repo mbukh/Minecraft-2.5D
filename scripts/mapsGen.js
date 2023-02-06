@@ -14,7 +14,7 @@ const seed = Math.random() * 10000;
 // How much the island is over the see;
 const groundLevel = 6;
 const mapLayers = 5;
-const mapSize = [14, 14];
+const mapSize = [15, 15];
 
 const mapData = generateMap({ seed, groundLevel, mapLayers, mapSize });
 const [mapSizeZ, mapSizeY, mapSizeX] = [
