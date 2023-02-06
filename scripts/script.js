@@ -35,6 +35,18 @@ const createTile = (x, y, layer, tileId) => {
     return tile;
 };
 
+const getLayer = (layer) => {
+    let layerDiv = mapsContainer.querySelector(`.layerId-${layer}`);
+    if (!layerDiv) {
+        layerDiv = document.createElement("div");
+        layerDiv.classList.add("mapLayer");
+        layerDiv.classList.add(`layerId-${layer}`);
+        layerDiv.style.setProperty("top", `-${layer * LAYERS_GAP}em`);
+        mapsContainer.appendChild(layerDiv);
+    }
+    return layerDiv;
+};
+
 const getCell = (y, x, layer) => {
     const layerDiv = getLayer(layer);
     let cell = mapsContainer.querySelector(`.y-${y}.x-${x}.layer-${layer}`);
@@ -52,18 +64,6 @@ const getCell = (y, x, layer) => {
     return cell;
 };
 
-const getLayer = (layer) => {
-    let layerDiv = mapsContainer.querySelector(`.layerId-${layer}`);
-    if (!layerDiv) {
-        layerDiv = document.createElement("div");
-        layerDiv.classList.add("mapLayer");
-        layerDiv.classList.add(`layerId-${layer}`);
-        layerDiv.style.setProperty("top", `-${layer * LAYERS_GAP}em`);
-        mapsContainer.appendChild(layerDiv);
-    }
-    return layerDiv;
-};
-
 const getTile = (x, y, layer) => {
     const cell = getCell(y, x, layer);
     const tile = cell.querySelector(".tile");
@@ -75,9 +75,11 @@ const getTile = (x, y, layer) => {
 };
 
 const setTile = (x, y, layer, tileId) => {
+    console.log(x, y, layer, tileId);
     const tile = getTile(x, y, layer);
     const div = tile.querySelector("div");
     div.className = `tile-${tileId}`;
+    return div.parentElement;
 };
 
 // const setTileHeight = (x, y, height) => {

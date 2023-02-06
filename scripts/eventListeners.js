@@ -75,72 +75,72 @@ function activateDragToMove() {
 
 // Tiles touch
 function activateTiles() {
-    document.querySelectorAll(".tile").forEach((el) =>
-        el.addEventListener("click", (e) => {
-            // Disable while move map or if no tool selected
-            if (screenDragging || !currentTool) return;
+    document.querySelectorAll(".tile").forEach((el) => makeTileActive(el));
+}
 
-            // Tak action
-            // el === e.currentTarget
-            const blockDiv = el.parentElement;
-            const tileInnerDiv = e.target;
+function makeTileActive(el) {
+    el.addEventListener("click", (e) => {
+        // Disable while move map or if no tool selected
+        if (screenDragging || !currentTool) return;
 
-            // get click position relative to the element center
-            // https://stackoverflow.com/questions/3234256/find-mouse-position-relative-to-element/42111623#42111623
-            const rect = tileInnerDiv.getBoundingClientRect();
-            const clickX = e.clientX - rect.left - rect.width / 2;
-            const clickY = e.clientY - rect.top - rect.height / 2;
-            console.log([clickX, clickY]);
+        // Tak action
+        // el === e.currentTarget
+        const blockDiv = el.parentElement;
+        const tileInnerDiv = e.target;
 
-            if (currentTool["builds"]) {
-                // Build Action
-                // get block by coordinate
-                const regLayer = new RegExp("layer-(\\d+)", "i");
-                const regY = new RegExp("y-(\\d+)", "i");
-                const regX = new RegExp("x-(\\d+)", "i");
-                const originLayer = regLayer.exec(blockDiv.className)[1];
-                const originY = regY.exec(blockDiv.className)[1];
-                const originX = regX.exec(blockDiv.className)[1];
+        // get click position relative to the element center
+        // https://stackoverflow.com/questions/3234256/find-mouse-position-relative-to-element/42111623#42111623
+        const rect = tileInnerDiv.getBoundingClientRect();
+        const clickX = e.clientX - rect.left - rect.width / 2;
+        const clickY = e.clientY - rect.top - rect.height / 2;
+        console.log([clickX, clickY]);
 
-                const regTile = new RegExp("tile-(\\d+)", "i");
-                const targetBlockId = expression.exec(e.target.className)[1];
+        if (currentTool["builds"]) {
+            // Build Action
 
-                console.log(originLayer);
-                console.log(originY);
-                console.log(originX);
-                // Prepare a new block
-                setTile(originX, originY, originLayer + 1);
-                return;
-            } else if (currentTool.canDestroy.length) {
-                // Destroy Action
+            // get block by coordinate
+            const regLayer = new RegExp("layer-(\\d+)", "i");
+            const regY = new RegExp("y-(\\d+)", "i");
+            const regX = new RegExp("x-(\\d+)", "i");
+            const originZ = Number(regLayer.exec(blockDiv.className)[1]);
+            const originY = Number(regY.exec(blockDiv.className)[1]);
+            const originX = Number(regX.exec(blockDiv.className)[1]);
 
-                if (e.target.style.classList?.contains("hide")) {
-                    console.log("no block here");
-                    return;
-                }
-                // get block by tileId
-                const regTile = new RegExp("tile-(\\d+)", "i");
-                const targetBlockId = Number(
-                    regTile.exec(e.target.className)[1]
+            // Prepare a new block
+            if (!tileExistsOnMap(originX, originY, originZ + 1)) {
+                const newTile = setTile(
+                    originX,
+                    originY,
+                    originZ + 1,
+                    currentTool.builds.id
                 );
-                const targetBlock = findBlockById(targetBlockId);
-                // Check if a tool can destroy it
-                if (
-                    targetBlock &&
-                    currentTool.canDestroy.includes(targetBlock)
-                ) {
-                    el.classList.add("hide");
-                    if (targetBlockId === 4 && currentTool === tools.bucket) {
-                        // Replace shore to sand with bucket
-                        e.target.classList.remove("tile-4");
-                        e.target.classList.add("tile-5");
-                        el.classList.remove("hide");
-                    }
-                } else
-                    console.log(
-                        `${currentTool.name} cannot destroy ${targetBlock.name}`
-                    );
+                makeTileActive(newTile);
+            } else console.log("can't build there");
+        } else if (currentTool.canDestroy.length) {
+            // Destroy Action
+
+            // if a hidden tile clicked
+            if (e.target.style.classList?.contains("hide")) {
+                console.log("no block here");
+                return;
             }
-        })
-    );
+            // get block by tileId
+            const regTile = new RegExp("tile-(\\d+)", "i");
+            const targetBlockId = Number(regTile.exec(e.target.className)[1]);
+            const targetBlock = findBlockById(targetBlockId);
+            // Check if a tool can destroy it
+            if (targetBlock && currentTool.canDestroy.includes(targetBlock)) {
+                el.classList.add("hide");
+                if (targetBlockId === 4 && currentTool === tools.bucket) {
+                    // Replace shore to sand with bucket
+                    e.target.classList.remove("tile-4");
+                    e.target.classList.add("tile-5");
+                    el.classList.remove("hide");
+                }
+            } else
+                console.log(
+                    `${currentTool.name} cannot destroy ${targetBlock.name}`
+                );
+        }
+    });
 }

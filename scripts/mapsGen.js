@@ -60,7 +60,7 @@ function generateHeights(targetMap, { seed = 1, maxHeight = 6 }) {
             heightsMap[x][y] = res;
         }
     }
-    console.table(heightsMap);
+    // console.table(heightsMap);
     return heightsMap;
 }
 
@@ -122,4 +122,19 @@ function isPeninsula(map, y, x) {
         +(map[y + 1][x + 1] < map[y][x]) +
         0
     return neighborsNum >= 4;
+}
+
+function tileExistsOnMap(x, y, z) {
+    if (
+        x < 0 ||
+        y < 0 ||
+        z < 0 ||
+        x >= mapSizeX ||
+        y >= mapSizeY ||
+        z >= mapSizeZ
+    ) {
+        console.log("out of bounds");
+        return true;
+    }
+    return mapData[z][y][x] > 0;
 }
