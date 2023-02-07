@@ -17,9 +17,16 @@ body {
 }
 
 .landing {
+    --offsetX: 0px;
+    --offsetY: 0px;
     width: 100vw;
     height: 100vh;
-    background: url(../assets/background.webp) no-repeat 63% top / cover;
+    background: url(../assets/background.webp);
+    background-size: cover;
+    background-position-x: calc(63% + var(--offsetX));
+    background-position-y: calc(0% + var(--offsetY));
+    background-repeat: no-repeat;
+    scale: 1.15;
 }
 
 /* panel */
