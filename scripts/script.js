@@ -27,7 +27,6 @@ const createTile = (x, y, layer, tileId) => {
     let tile = cell.querySelector(".tile");
     if (!tile) {
         tile = tileTemplate.cloneNode(true);
-        tile.style.setProperty("z-index", (layer + 1) * 1000 + x + y);
         cell.appendChild(tile);
     }
     const innerDiv = tile.querySelector("div");
@@ -59,6 +58,7 @@ const getCell = (y, x, layer) => {
         transformX = `translateX(${x * GAP_X}em)`;
         transformY = `translateY(${y * GAP_Y}em)`;
         cell.style.setProperty("transform", `${transformX} ${transformY}`);
+        cell.style.setProperty("z-index", layer + x + y);
         layerDiv.appendChild(cell);
     }
     return cell;

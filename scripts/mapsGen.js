@@ -8,6 +8,7 @@
 // TODO
 // IDEA: don't math floor to int value leave toFixes(1) ~ 0.5
 // sometimes there are uncontrolled empty places inside the island
+// For upper layer use css filter: sepia(10%+) to change color
 
 // Seed of randomization or use Math.random() * 10000
 const seed = Math.random() * 10000;

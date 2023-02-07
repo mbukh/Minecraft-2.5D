@@ -78,6 +78,7 @@ function makeTileActive(el) {
         const originZ = Number(regZ.exec(blockDiv.className)[1]);
         const originY = Number(regY.exec(blockDiv.className)[1]);
         const originX = Number(regX.exec(blockDiv.className)[1]);
+        let [targetZ, targetY, targetX] = [originZ, originY, originX];
 
         if (currentTool["builds"]) {
             // Build Action
@@ -89,18 +90,28 @@ function makeTileActive(el) {
             const clickY = e.clientY - rect.top - rect.height / 2;
             console.log([clickX, clickY]);
 
+            if (clickX > 0 && clickY > 0) {
+                // Build to the right
+                targetX += 1;
+            } else if (clickX < 0 && clickY > 0) {
+                // Build to the left
+                targetY += 1;
+            } else {
+                // build to the top
+                targetZ += 1;
+            }
             // Prepare a new block
-            if (!tileExistsOnMap(originX, originY, originZ + 1)) {
+            if (!tileExistsOnMap(targetX, targetY, targetZ)) {
                 const newTile = setTile(
-                    originX,
-                    originY,
-                    originZ + 1,
+                    targetX,
+                    targetY,
+                    targetZ,
                     currentTool.builds.id
                 );
                 makeTileActive(newTile);
-                showTile(originX, originY, originZ + 1);
+                showTile(targetX, targetY, targetZ);
                 // Save data to the map
-                mapData[originZ + 1][originY][originX] = currentTool.builds.id;
+                mapData[targetZ][targetY][targetX] = currentTool.builds.id;
             } else console.log("can't build there");
         } else if (currentTool.canDestroy.length) {
             // Destroy Action
