@@ -77,4 +77,3 @@ function activateDragToMove() {
 function activateTiles() {
     document.querySelectorAll(".tile").forEach((el) => makeTileActive(el));
 }
-

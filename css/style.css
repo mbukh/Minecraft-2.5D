@@ -25,7 +25,7 @@ body {
 #mapsContainer .mapLayer {
     display: block;
     position: absolute;
-    transform: rotateX(60deg) rotateZ(45deg);
+    transform: rotateX(62deg) rotateZ(45deg);
     z-index: 1000;
 }
 .mapLayer > div {
