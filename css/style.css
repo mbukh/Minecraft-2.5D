@@ -56,7 +56,7 @@ body {
 }
 
 .tile > div {
-    box-shadow: 0 0 0 1px red;
+    /* box-shadow: 0 0 0 1px red; */
     transform: rotateZ(-45deg) rotateY(-60deg)
         translate3d(-4.1em, -3.3em, -3.1em);
     width: 10em;
