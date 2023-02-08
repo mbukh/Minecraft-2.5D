@@ -2,78 +2,109 @@
 // ===============================================================
 // Events
 
+// update zoom status from css
+window.addEventListener(
+    "load",
+    () =>
+        (zoom.textContent = Number(getComputedStyle(mapsContainer).scale) * 100)
+);
+
+// reset map position to center
 window.addEventListener("resize", (e) => setMapPosition(0, 0));
 
+// activate tools panel clicks
 function activateTools() {
-    toolDivs.forEach((tool) => {
-        tool.addEventListener("mousedown", (e) => {
-            const image = `../assets/cursors/${tool.id}.png`;
-            const toolName = tool.id;
-            document.body.style.setProperty("--cursor", `url(${image})`);
-            toolDivs.forEach((tool) => tool.classList.remove("active"));
-            tool.classList.add("active");
-            currentTool = tools[toolName];
-        });
-    });
-}
-
-function activateDragToMove() {
-    var mousePos = {};
-    var mapPos = {};
-
-    // Move map by mouse
-    document.body.addEventListener("mousedown", (e) => {
-        mousePos.x = e.pageX;
-        mousePos.y = e.pageY;
-        mapPos.x = mapPosition.x;
-        mapPos.y = mapPosition.y;
-        screenReadyToDrag = true;
-    });
-
-    document.body.addEventListener("mousemove", (e) => {
-        if (screenReadyToDrag) {
-            e.preventDefault();
-            setMapPosition(
-                mapPos.x + (e.pageX - mousePos.x),
-                mapPos.y + (e.pageY - mousePos.y)
-            );
-            setTimeout(() => (screenDragging = true), 100);
-        }
-    });
-    // Cancel map move on mouse up
-    document.body.addEventListener("mouseup", (e) => {
-        screenReadyToDrag = false;
-        setTimeout(() => (screenDragging = false), 100);
-    });
-
-    // scaling
-    // from https://codepen.io/iwillwen/pen/PMNjBW?html-preprocessor=none
-    let scale = 1;
-    let scaleTimeOut;
-    let deltaY = 0;
-    // A delay is created before changes are made
-    // If user inputs again it cancels previous call
-    window.addEventListener(
-        "wheel",
-        (e) => {
-            e.preventDefault();
-            clearTimeout(scaleTimeOut);
-            deltaY += e.deltaY;
-            deltaY = Math.min(Math.max(50, Math.abs(deltaY)), 400); // Restrict deltaY
-            deltaY = deltaY * Math.sign(e.deltaY); // Normalize scroll wheel
-            scale -= deltaY / 10000;
-            scale = Math.min(Math.max(MIN_ZOOM, scale), MAX_ZOOM); // Limit scale
-            zoom.textContent = Math.round(scale * 100);
-            scaleTimeOut = setTimeout(() => {
-                mapsContainer.style.setProperty("scale", scale);
-                deltaY = 0;
-            }, 100);
-        },
-        { passive: false }
-    );
+    toolsDiv.addEventListener("mousedown", handleToolsClicks);
 }
 
 // Tiles touch
 function activateTiles() {
-    document.querySelectorAll(".tile").forEach((el) => makeTileActive(el));
+    mapsContainer.addEventListener("click", handleTilesClicks);
+}
+
+function handleTilesClicks(e) {
+    // filter unwanted events
+    if (!e.target.parentElement.matches(".tile")) return;
+    // Disable while moving map or if no tool selected
+    if (screenDragging || !currentTool) return;
+    // if a hidden tile clicked
+    if (e.target.style.classList?.contains("hide")) return;
+
+    const blockDiv = e.target.parentElement.parentElement;
+    const tile = e.target.parentElement;
+    const innerTile = e.target;
+
+    console.log(blockDiv);
+
+    // get block coordinates X, Y, Z
+    const regZ = new RegExp("layer-(\\d+)", "i");
+    const regY = new RegExp("y-(\\d+)", "i");
+    const regX = new RegExp("x-(\\d+)", "i");
+    const originZ = Number(regZ.exec(blockDiv.className)[1]);
+    const originY = Number(regY.exec(blockDiv.className)[1]);
+    const originX = Number(regX.exec(blockDiv.className)[1]);
+    let [targetZ, targetY, targetX] = [originZ, originY, originX];
+
+    if (currentTool["builds"]) {
+        // Build Action
+
+        // get click position relative to the element center
+        // https://stackoverflow.com/questions/3234256/find-mouse-position-relative-to-element/42111623#42111623
+        const rect = innerTile.getBoundingClientRect();
+        const clickX = e.clientX - rect.left - rect.width / 2;
+        const clickY = e.clientY - rect.top - rect.height / 2;
+        console.log([clickX, clickY]);
+
+        if (clickX > 0 && clickY > 0) {
+            // Build to the right
+            targetX += 1;
+        } else if (clickX < 0 && clickY > 0) {
+            // Build to the left
+            targetY += 1;
+        } else {
+            // build to the top
+            targetZ += 1;
+        }
+        // Prepare a new block
+        if (!tileExistsOnMap(targetX, targetY, targetZ)) {
+            const newTile = setTile(
+                targetX,
+                targetY,
+                targetZ,
+                currentTool.builds.id
+            );
+            showTile(targetX, targetY, targetZ);
+            // Save data to the map
+            mapData[targetZ][targetY][targetX] = currentTool.builds.id;
+        } else console.log("can't build there");
+    } else if (currentTool.canDestroy.length) {
+        // Destroy Action
+
+        // get block by tileId
+        const regTile = new RegExp("tile-(\\d+)", "i");
+        const targetBlockId = Number(regTile.exec(innerTile.className)[1]);
+        const targetBlock = findBlockById(targetBlockId);
+        // Check if a tool can destroy it
+        if (targetBlock && currentTool.canDestroy.includes(targetBlock)) {
+            // Remove the block
+            tile.classList.add("hide");
+            // Save data to the map
+            mapData[originZ][originY][originX] = null;
+
+            // Replace shore to sand with bucket
+            if (
+                targetBlockId === blocks.shore.id &&
+                currentTool === tools.bucket
+            ) {
+                innerTile.classList.remove("tile-4");
+                hideTile(originX, originY, originZ);
+                innerTile.classList.add("tile-5");
+                setTimeout(() => showTile(originX, originY, originZ), 1000);
+                mapData[originZ][originY][originX] = blocks.sand.id;
+            }
+        } else
+            console.log(
+                `${currentTool.name} cannot destroy ${targetBlock.name}`
+            );
+    }
 }

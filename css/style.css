@@ -18,7 +18,7 @@ body {
     position: absolute;
     left: 50%;
     top: 30%;
-    scale: 1;
+    scale: 1.5;
     transition: scale 0.3s ease-in-out;
 }
 
@@ -57,19 +57,20 @@ body {
 
 .tile > div {
     /* box-shadow: 0 0 0 1px red; */
-    transform: rotateZ(-45deg) rotateY(-60deg)
+    transform: rotateZ(-45deg) rotateY(-61deg)
         translate3d(-4.1em, -3.3em, -3.1em);
     width: 10em;
     height: 12em;
     background-size: calc(100% * var(--tile-scale)) 100%;
     background-image: url(../tiles-solid.png);
-    background-position: calc(
+    background-position-x: calc(
         var(--tile-offset) - calc(var(--tile-index) - 1) * var(--tile-size)
     );
+    background-position-y: 0;
     background-repeat: no-repeat;
-    image-rendering: crisp-edges; /* pixelated */
+    image-rendering: pixelated;
     transition: height;
-    transition-delay: 0;
+    transition-delay: 0s;
     cursor: var(--cursor) 16 0, pointer;
 }
 .tile.hide > div,

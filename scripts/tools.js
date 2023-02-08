@@ -52,3 +52,17 @@ const tools = {
         builds: blocks.flowerPoppy,
     },
 };
+
+// functions
+
+function handleToolsClicks(e) {
+    const tool = e.target;
+    const image = `../assets/cursors/${tool.id}.png`;
+    const toolName = tool.id;
+    document.body.style.setProperty("--cursor", `url(${image})`);
+    Array.from(toolsDiv.children).forEach((tool) =>
+        tool.classList.remove("active")
+    );
+    tool.classList.add("active");
+    currentTool = tools[toolName];
+}
