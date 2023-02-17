@@ -74,56 +74,74 @@ function trigProduct(nx, ny) {
 
 function heightsTo3dMap(heightsMap, genMap) {
     const topLayer = genMap.length - 1;
-    // Top to bottom Z each X and Y;
+    // Iterate through each position in the 2D heights map and modify the corresponding block in the 3D map.
     for (let y = heightsMap.length - 1; y >= 0; y--)
         for (let x = heightsMap[y].length - 1; x >= 0; x--)
             for (let z = topLayer; z >= 0; z--) {
+                // Get the type of block at the current position and its maximum height.
                 let tile = heightsMap[y][x];
                 let tileMaxHeight = findBlockById(tile).maxHeight;
-                // Create change to lower a block (except shore and waters)
+
+                // Determine the chance to lower the block, based on its type. (except shore and waters)
+                // To create more dynamic map
                 let chance = +(tile >= blocks.sand.id) * (rand(1, 4) === 1);
                 let heightChange = rand(2, 4) / 10;
                 let destHeight = tileMaxHeight - heightChange * chance;
                 let newHeight = Math.max(0, destHeight);
+
+                // Remove blocks that are too high for their current height and modify others as needed.
                 if (z / topLayer > newHeight) {
-                    // Remove tiles from height about their limit
-                    // Lowers some blocks to create more dynamic map
                     tile = null;
-                } else if (
-                    z < topLayer &&
-                    (genMap[z + 1][y][x] === blocks.grass.id ||
+                } else if (z < topLayer) {
+                    if (
+                        genMap[z + 1][y][x] === blocks.grass.id ||
                         genMap[z + 1][y][x] === blocks.snow.id ||
-                        genMap[z + 1][y][x] === blocks.dirt.id)
-                ) {
-                    // Make snow and grass top layers only
-                    tile = blocks.dirt.id;
-                } else if (
-                    z < topLayer &&
-                    !genMap[z + 1][y][x] &&
-                    isPeninsula(heightsMap, y, x) &&
-                    rand(1, 2) === 1
-                ) {
-                    // add flower to peninsulas
-                    genMap[z + 1][y][x] = blocks.flowerPoppy.id;
+                        genMap[z + 1][y][x] === blocks.dirt.id
+                    ) {
+                        // Make snow and grass top layers only
+                        tile = blocks.dirt.id;
+                    } else if (
+                        !genMap[z + 1][y][x] &&
+                        isPeninsula(heightsMap, y, x) &&
+                        rand(1, 2) === 1
+                    ) {
+                        // add flower to peninsulas
+                        genMap[z + 1][y][x] = blocks.flowerPoppy.id;
+                    }
                 }
 
+                // Update the block in the 3D map.
                 genMap[z][y][x] = tile;
             }
     return genMap;
 }
 
 function isPeninsula(map, y, x) {
-    if (map[y][x] < blocks.sand.id) return false;
-    // prettier-ignore
-    const neighborsNum = 0 +
-        +(map[y - 1][x - 1] < map[y][x]) +
-        +(map[y - 1][x]     < map[y][x]) +
-        +(map[y][x - 1]     < map[y][x]) +
-        +(map[y][x + 1]     < map[y][x]) +
-        +(map[y + 1][x]     < map[y][x]) +
-        +(map[y + 1][x + 1] < map[y][x]) +
-        0
-    return neighborsNum >= 4;
+    const currentHeight = map[y][x];
+
+    if (currentHeight < blocks.sand.id) {
+        // Block is lower than sand, so it cannot be a peninsula
+        return false;
+    }
+
+    const neighborHeights = [
+        [y - 1, x - 1],
+        [y - 1, x],
+        [y, x - 1],
+        [y, x + 1],
+        [y + 1, x],
+        [y + 1, x + 1],
+    ];
+
+    let numLowerNeighbors = 0;
+    for (const [ny, nx] of neighborHeights) {
+        if (map[ny] && map[ny][nx] && map[ny][nx] < currentHeight) {
+            numLowerNeighbors++;
+        }
+    }
+
+    // Return true if there are 4 or more lower neighbors
+    return numLowerNeighbors >= 4;
 }
 
 function tileExistsOnMap(x, y, z) {
