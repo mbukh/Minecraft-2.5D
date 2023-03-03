@@ -6,6 +6,10 @@ https://benjaminaster.com/2d-css-minecraft/
 
 https://codepen.io/rdfriedl/pen/bdvrjM
 
+## moving item / character
+
+https://codepen.io/DrKain/pen/RaOmGx
+
 ## about mapgen
 
 https://www.redblobgames.com/maps/terrain-from-noise/#elevation-redistribution
